@@ -1,0 +1,41 @@
+#include "Sphere.h"
+#include <cassert>
+
+Sphere::Sphere(const Vector pos, const double radius): _pos {pos}, _radius {radius} {
+}
+
+Vector Sphere::pos() const {
+	return _pos;
+}
+double Sphere::radius() const {
+	return _radius;
+}
+
+MaybeVector Sphere::intersection(const Line& ray) const {
+	const double dx {ray.direction().x()};
+	const double dy {ray.direction().y()};
+	const double dz {ray.direction().z()};
+
+	const double cx {ray.offset().x() - pos.x()};
+	const double cy {ray.offset().y() - pos.y()};
+	const double cz {ray.offset().z() - pos.z()};
+
+	const double a {dx*dx + dy*dy + dz*dz};
+	const double b {2*(cx*dx + cy*dy + cz*dz)};
+	const double c {cx*cx + cy*cy + cz*cz};
+
+	const double d {b*b - 4*a*c};
+	// Solution doesn't exist
+	if (d < 0) 
+		return MaybeVector {false, {0, 0, 0}};
+
+	// Otherwise, use minimum root
+	const double s {(-b - std::sqrt(d))/(2*a)};
+	return {true, {s*dx + ray.offset().x(), s*dy + ray.offset().y(), s*dy + ray.offset().y()}};
+}
+
+Vector Sphere::normal(const Vector& point, const Vector& light) const {
+	assert(point.x()*point.x() + point.y()*point.y() + point.z()*point.z() == _radius);
+
+	return point - pos;
+}

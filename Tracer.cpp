@@ -1,5 +1,5 @@
-#include "Tracer.h"
-#include "Vector.h"
+#include "Tracer.h" 
+#include "Vector.h" 
 #include "Line.h"
 
 #include <limits>
@@ -10,7 +10,8 @@ image trace(const SurfaceList& world,
 		const Vector& eye,
 		const ResSpec& resolution, 
 		const Corner& c1, 
-		const Corner& c2) {
+		const Corner& c2,
+		const double plane_offset) {
 	const int xmin {std::min(c1.first, c2.first)};
 	const int xmax {std::max(c1.first, c2.first)};
 	const int ymin {std::min(c1.second, c2.second)};
@@ -30,7 +31,7 @@ image trace(const SurfaceList& world,
 			const double y {ymin + j*yscale};
 
 			// Ray from our eye to our current (x, y)
-			const Line ray {{Vector {x, y, 0} - eye}, eye};
+			const Line ray {{Vector {x, y, plane_offset + eye.z()} - eye}, eye};
 
 			// Find closest hit
 			double distance {std::numeric_limits<double>::infinity()};

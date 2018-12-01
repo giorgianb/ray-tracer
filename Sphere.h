@@ -5,8 +5,13 @@ class Sphere: public Surface {
 	private:
 		const Vector _pos;
 		const double _radius;
+		const Color _color;
 	public:
-		Sphere(const Vector pos, const double radius);
+		MaybeVector intersection(const Line& ray) const;
+		Vector normal(const Vector& point, const Vector& light) const;
+		Color color(const Vector& point) const;
+
+		Sphere(const Vector pos, const double radius, const Color color);
 		Vector pos() const;
 		double radius() const;
 };

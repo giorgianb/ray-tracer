@@ -31,7 +31,7 @@ void Vector::z(const double z) {
 	_z = z;
 }
 
-Vector& operator+=(const Vector& v) {
+Vector& Vector::operator+=(const Vector& v) {
 	_x += v.x();
 	_y += v.y();
 	_z += v.z();

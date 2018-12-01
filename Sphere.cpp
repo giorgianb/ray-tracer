@@ -1,12 +1,15 @@
 #include "Sphere.h"
 #include <cassert>
+#include <cmath>
 
-Sphere::Sphere(const Vector pos, const double radius): _pos {pos}, _radius {radius} {
+Sphere::Sphere(const Vector pos, const double radius, const Color color): 
+	_pos {pos}, _radius {radius}, _color {color} {
 }
 
 Vector Sphere::pos() const {
 	return _pos;
 }
+
 double Sphere::radius() const {
 	return _radius;
 }
@@ -16,13 +19,13 @@ MaybeVector Sphere::intersection(const Line& ray) const {
 	const double dy {ray.direction().y()};
 	const double dz {ray.direction().z()};
 
-	const double cx {ray.offset().x() - pos.x()};
-	const double cy {ray.offset().y() - pos.y()};
-	const double cz {ray.offset().z() - pos.z()};
+	const double cx {ray.offset().x() - pos().x()};
+	const double cy {ray.offset().y() - pos().y()};
+	const double cz {ray.offset().z() - pos().z()};
 
 	const double a {dx*dx + dy*dy + dz*dz};
 	const double b {2*(cx*dx + cy*dy + cz*dz)};
-	const double c {cx*cx + cy*cy + cz*cz};
+	const double c {cx*cx + cy*cy + cz*cz - _radius*_radius};
 
 	const double d {b*b - 4*a*c};
 	// Solution doesn't exist
@@ -31,11 +34,17 @@ MaybeVector Sphere::intersection(const Line& ray) const {
 
 	// Otherwise, use minimum root
 	const double s {(-b - std::sqrt(d))/(2*a)};
-	return {true, {s*dx + ray.offset().x(), s*dy + ray.offset().y(), s*dy + ray.offset().y()}};
+	return {true, evaluate(ray, s)};
 }
 
 Vector Sphere::normal(const Vector& point, const Vector& light) const {
-	assert(point.x()*point.x() + point.y()*point.y() + point.z()*point.z() == _radius);
+	assert(std::fabs(magnitude(point - _pos) - _radius) < 0.001);
 
-	return point - pos;
+	return normalize(point - _pos);
+}
+
+Color Sphere::color(const Vector& point) const {
+	assert(std::fabs(magnitude(point - _pos) - _radius) < 0.001);
+
+	return _color;
 }

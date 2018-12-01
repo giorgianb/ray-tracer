@@ -5,11 +5,11 @@ Line::Line(const Vector& direction, const Vector& offset):
 }
 
 Vector Line::direction() const {
-	return direction;
+	return _direction;
 }
 
 Vector Line::offset() const {
-	return offset;
+	return _offset;
 }
 
 Vector evaluate(const Line& l, const double& s) {

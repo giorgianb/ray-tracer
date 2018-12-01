@@ -1,5 +1,8 @@
 #ifndef __RAY_TRACER_VECTOR_INCLUDED
 #define __RAY_TRACER_VECTOR_INCLUDED
+
+#include <utility>
+
 class Vector {
 	private:
 		double _x;
@@ -16,10 +19,10 @@ class Vector {
 		void y(const double y);
 		void z(const double z);
 
-		Vector operator+=(const Vector& v);
-		Vector operator-=(const Vector& v);
-		Vector operator*=(const double k);
-		Vector operator/=(const double k);
+		Vector& operator+=(const Vector& v);
+		Vector& operator-=(const Vector& v);
+		Vector& operator*=(const double k);
+		Vector& operator/=(const double k);
 };
 
 double operator*(const Vector& v1, const Vector& v2);

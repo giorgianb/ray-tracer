@@ -2,29 +2,9 @@
 #include "Vector.h"
 #include "Line.h"
 
-#include "Sphere.h"
-
 #include <limits>
 #include <cmath>
 #include <iostream>
-
-void print_vector(const Vector& v) {
-	std::cout << "Vector {" << v.x() << ", " << v.y() << ", " << v.z() << "}";
-}
-
-void print_line(const Line& l) {
-	std::cout << "Line {";
-	print_vector(l.direction());
-	std::cout << ", ";
-	print_vector(l.offset());
-	std::cout << "}";
-}
-
-void print_sphere(const Sphere& s) {
-	std::cout << "Sphere {";
-	print_vector(s.pos());
-	std::cout << ", " << s.radius() << "}";
-}
 
 image trace(const SurfaceList& world, 
 		const Vector& eye,

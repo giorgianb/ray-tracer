@@ -15,7 +15,7 @@ SurfaceList read_surfaces(std::istream& in);
 enum command_line_options
 {
 	input_file, output_file, x_resolution, y_resolution, 
-	x_min, x_max, y_min, y_max, offset, eye_x, eye_y, eye_z, help
+	x_min, x_max, y_min, y_max, offset, eye_x, eye_y, eye_z, brightness, help
 };
 
 
@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
 		{"eye-x", required_argument, nullptr, eye_x},
 		{"eye-y", required_argument, nullptr, eye_y},
 		{"eye-z", required_argument, nullptr, eye_z},
+		{"brightness", required_argument, nullptr, brightness},
 		{"help", no_argument, NULL, help},
 		{0, 0, 0, 0}
 	};
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
 	Corner lower {-100, -100};
 	Corner upper {100, 100};
 	Vector eye {0, 0, -250};
+	double b {2e6};
 	for (;;) {
 		int option_index {0};
 
@@ -94,6 +96,9 @@ int main(int argc, char *argv[]) {
 				sscanf(optarg, "%d", &z);
 				eye.z(z);
 				break;
+			case brightness:
+				sscanf(optarg, "%lf", &b);
+				break;
 			case help:
 			{
 				static const char *const help_message = 
@@ -108,7 +113,8 @@ int main(int argc, char *argv[]) {
 				"--offset, --offset=\t\tSpecifies offset of viewing plane.\n"
 				"--eye-x, --eye-x=\t\tSpecifies x-coordinate of eye.\n"
 				"--eye-y, --eye-y=\t\tSpecifies y-coordinate of eye.\n"
-				"--eye-z, --eye-z=\t\tSpecifies z-coordinate of eye.\n\n\n"
+				"--eye-z, --eye-z=\t\tSpecifies z-coordinate of eye.\n"
+				"brightness, --brightness=\tSpecifies brightness.\n\n\n"
 				"If no input file is provided, shapes are read from standard input.";
 				std::cout << help_message << '\n';
 
@@ -134,6 +140,7 @@ int main(int argc, char *argv[]) {
 		<< upper.first << ", " << upper.second << ")\n";
 	std::cout << "Viewing Plane " << plane_offset << " in front of the eye.\n";
 	std::cout << "Eye located at: (" << eye.x() << ", " << eye.y() << ", " << eye.z() << ")\n";
+	std::cout << "Brightness: " << b << '\n';
 
 	SurfaceList world;
 	if (file_name) {
@@ -142,7 +149,7 @@ int main(int argc, char *argv[]) {
 	} else
 		world = read_surfaces(std::cin);
 
-	const image traced {trace(world, eye, resolution, lower, upper, plane_offset)};
+	const image traced {trace(world, eye, resolution, lower, upper, plane_offset, b)};
 
 	std::ofstream out {output_file_name};
 	out << "P2 " << resolution.first << ' ' << resolution.second << ' ' << 255 << '\n';

@@ -7,7 +7,7 @@
 using Row = std::vector<double>;
 using Matrix = std::vector<Row>;
 using AugmentedMatrix = std::pair<Matrix, Matrix>;
-enum SolutionSetType {none, unique, infinite};
+enum class SolutionSetType {none, unique, infinite};
 using MaybeSolution = std::pair<SolutionSetType, Matrix>;
 
 Matrix create_matrix(const size_t n, const size_t m);

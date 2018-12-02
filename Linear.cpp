@@ -83,7 +83,6 @@ AugmentedMatrix rref(const AugmentedMatrix& am) {
 	return {m, a};
 }
 
-#include <iostream>
 SolutionSetType number_solutions(const AugmentedMatrix& am) {
 	assert(am.first.size() == am.second.size());
 
@@ -97,24 +96,24 @@ SolutionSetType number_solutions(const AugmentedMatrix& am) {
 		// check if augmented matrix contains a non-zero
 		for (size_t j {0}; zero_row && j < a[i].size(); ++j)
 			if (std::fabs(a[i][j]) > ESP) 
-				return none;
+				return SolutionSetType::none;
 	}
 
 	// check if we have row with a non-zero value outside of the diagonal
 	for (size_t i {0}; i < m.size(); ++i) {
 		for (size_t j {0}; j < m[i].size(); ++j)
 			if (i != j && fabs(m[i][j]) > ESP)
-				return infinite;
+				return SolutionSetType::infinite;
 	}
 
-	return unique;
+	return SolutionSetType::unique;
 }
 
 MaybeSolution solution(const AugmentedMatrix& am) {
 	assert(am.first.size() == am.second.size());
 
 	const SolutionSetType s {number_solutions(am)};
-	if (s != unique)
+	if (s != SolutionSetType::unique)
 		return {s, {}};
 
 	return {s, am.second};

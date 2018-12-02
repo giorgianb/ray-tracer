@@ -109,7 +109,7 @@ SolutionSetType number_solutions(const AugmentedMatrix& am) {
 	return SolutionSetType::unique;
 }
 
-MaybeSolution solution(const AugmentedMatrix& am) {
+SolutionSet solution(const AugmentedMatrix& am) {
 	assert(am.first.size() == am.second.size());
 
 	const SolutionSetType s {number_solutions(am)};

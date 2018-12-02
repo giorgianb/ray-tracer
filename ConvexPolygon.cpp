@@ -5,7 +5,6 @@
 
 #include <cassert>
 
-
 std::vector<Vector> convex_hull(std::vector<Vector> polygon);
 
 ConvexPolygon::ConvexPolygon(const Plane& p, const LineSet& edges): _plane {p}, _edges {} {

@@ -33,6 +33,14 @@ Vector operator+(const Vector& v1, const Vector& v2);
 Vector operator-(const Vector& v);
 Vector operator-(const Vector& v1, const Vector& v2);
 Vector operator%(const Vector& v1, const Vector& v2);
+
+bool operator==(const Vector& v1, const Vector& v2);
+bool operator!=(const Vector& v1, const Vector& v2);
+bool operator<(const Vector& v1, const Vector& v2);
+bool operator<=(const Vector& v1, const Vector& v2);
+bool operator>(const Vector& v1, const Vector& v2);
+bool operator>=(const Vector& v1, const Vector& v2);
+
 double magnitude(const Vector& v);
 Vector normalize(const Vector& v);
 

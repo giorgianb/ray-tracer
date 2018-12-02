@@ -97,6 +97,30 @@ Vector operator%(const Vector& v1, const Vector& v2) {
 	return {s1, s2, s3};
 }
 
+bool operator==(const Vector& v1, const Vector& v2) {
+	return v1.x() == v2.x() && v1.y() == v2.y() && v1.z() == v2.z();
+}
+
+bool operator!=(const Vector& v1, const Vector& v2) {
+	return !(v1 == v2);
+}
+
+bool operator<(const Vector& v1, const Vector& v2) {
+	return v1.x() < v2.x() || v1.y() < v2.y() || v1.z() < v2.z();
+}
+
+bool operator<=(const Vector& v1, const Vector& v2) {
+	return v1 < v2 || v1 == v2;
+}
+
+bool operator>(const Vector& v1, const Vector& v2) {
+	return !(v1 <= v2);
+}
+
+bool operator>=(const Vector& v1, const Vector& v2) {
+	return v1 > v2 || v1 == v2;
+}
+
 double magnitude(const Vector& v)  {
 	return std::sqrt(v * v);
 }

@@ -65,7 +65,7 @@ LineConvexPolygonIntersection intersection(const ConvexPolygon& p, const Line& l
 				{p.plane().offset().z() - ip.z()}
 			}
 		};
-		const MaybeSolution s {solution(rref(am))};
+		const SolutionSet s {solution(rref(am))};
 		assert(s.first == SolutionSetType::unique);
 		assert(std::fabs(s.second[2][0]) <= ESP);
 		plane_points.push_back({s.second[0][0], s.second[1][0], 0});

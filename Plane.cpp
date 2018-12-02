@@ -1,5 +1,6 @@
 #include "Plane.h"
-Plane(const Vector& u, const Vector& v, const Vector& offset):
+
+Plane::Plane(const Vector& u, const Vector& v, const Vector& offset):
 	_u {u},
 	_v {v},
 	_offset {offset} {

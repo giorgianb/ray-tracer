@@ -1,5 +1,8 @@
 #ifndef __RAY_TRACER_PLANE_INCLUDED
 #define __RAY_TRACER_PLANE_INCLUDED
+
+#include "Vector.h"
+
 class Plane {
 	private:
 		const Vector _v;

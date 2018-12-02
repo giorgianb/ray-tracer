@@ -16,5 +16,6 @@ image trace(const SurfaceList& world,
 		const ResSpec& resolution, 
 		const Corner& c1, 
 		const Corner& c2,
-		const double plane_offset);
+		const double plane_offset,
+		const double brightness=1);
 #endif

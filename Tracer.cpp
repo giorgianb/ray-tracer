@@ -4,14 +4,14 @@
 
 #include <limits>
 #include <cmath>
-#include <iostream>
 
 image trace(const SurfaceList& world, 
 		const Vector& eye,
 		const ResSpec& resolution, 
 		const Corner& c1, 
 		const Corner& c2,
-		const double plane_offset) {
+		const double plane_offset,
+		const double brightness) {
 	const int xmin {std::min(c1.first, c2.first)};
 	const int xmax {std::max(c1.first, c2.first)};
 	const int ymin {std::min(c1.second, c2.second)};
@@ -53,7 +53,10 @@ image trace(const SurfaceList& world,
 				const Color sc {hit->color(h)};
 				const Vector dir {ray.direction()};
 				double intensity {std::abs(normalize(dir)*hit->normal(h, eye)) * sc};
-				traced[i][j] = std::max(0.0, std::round(intensity * 255));
+				intensity /= (magnitude(h - eye) * magnitude(h - eye));
+				intensity *= brightness;
+				intensity = std::min(255.0, std::round(intensity * 255));
+				traced[i][j] = std::max(0.0, intensity);
 			}
 		}
 	}

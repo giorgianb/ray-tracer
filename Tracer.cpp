@@ -31,14 +31,17 @@ image trace(const SurfaceList& world,
 			const double y {ymin + j*yscale};
 
 			// Ray from our eye to our current (x, y)
-			const Line ray {{Vector {x, y, plane_offset + eye.z()} - eye}, eye};
+			const Vector to_plane {Vector {x, y, plane_offset + eye.z()} - eye};
+			const Line ray {to_plane, eye};
 
 			// Find closest hit
 			double distance {std::numeric_limits<double>::infinity()};
 			Surface* hit {nullptr};
 			for (const auto& surface: world) {
 				MaybeVector phit {surface->intersection(ray)};
-				if (phit.first && magnitude(phit.second - eye) < distance) {
+				// also assures us that it is in front of the eye
+				if (phit.first && magnitude(phit.second - eye) < distance
+						&& (phit.second - eye) * to_plane > 0) {
 					hit = surface;
 					distance = magnitude(phit.second - eye);
 				}

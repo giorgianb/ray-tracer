@@ -59,13 +59,31 @@ AugmentedMatrix rref(const AugmentedMatrix& am) {
 		}
 	}
 
-	std::sort(m.begin(), m.end(), [](const Row& r1, const Row& r2) {
-			return leading_zeroes(r1) < leading_zeroes(r2);
+	using Key = std::pair<size_t, Row>;
+	std::vector<Key> m_to_sort;
+	std::vector<Key> a_to_sort;
+	for (size_t i {0}; i < m.size(); ++i) {
+		size_t nzeroes {leading_zeroes(m[i])};
+		m_to_sort.push_back({nzeroes, std::move(m[i])});
+		a_to_sort.push_back({nzeroes, std::move(a[i])});
+	}
+
+	std::sort(m_to_sort.begin(), m_to_sort.end(), [](const Key& k1, const Key& k2) {
+			return k1.first < k2.first;
 	});
+	std::sort(a_to_sort.begin(), a_to_sort.end(), [](const Key& k1, const Key& k2) {
+			return k1.first < k2.first;
+	});
+
+	for (size_t i {0}; i < m.size(); ++i) {
+		m[i] = std::move(m_to_sort[i].second);
+		a[i] = std::move(a_to_sort[i].second);
+	}
 
 	return {m, a};
 }
 
+#include <iostream>
 SolutionSetType number_solutions(const AugmentedMatrix& am) {
 	assert(am.first.size() == am.second.size());
 
@@ -77,8 +95,8 @@ SolutionSetType number_solutions(const AugmentedMatrix& am) {
 		// check if row contains all zeroes besides non-augmented matrix
 		const bool zero_row {leading_zeroes(m[i]) == m[i].size()};
 		// check if augmented matrix contains a non-zero
-		for (size_t j {0}; j < a[i].size(); ++j)
-			if (std::fabs(a[i][j]) > ESP)
+		for (size_t j {0}; zero_row && j < a[i].size(); ++j)
+			if (std::fabs(a[i][j]) > ESP) 
 				return none;
 	}
 

@@ -13,8 +13,8 @@ using MaybeSolution = std::pair<SolutionSetType, Matrix>;
 Matrix create_matrix(const size_t n, const size_t m);
 Matrix rref(const Matrix& m);
 AugmentedMatrix rref(const AugmentedMatrix& am);
-SolutionSetType number_solutions(const Matrix& m);
-MaybeSolution solution(const Matrix& m);
+SolutionSetType number_solutions(const AugmentedMatrix& m);
+MaybeSolution solution(const AugmentedMatrix& m);
 
-constexpr double ESP {1e-6};
+constexpr double ESP {0};
 #endif

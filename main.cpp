@@ -1,6 +1,7 @@
 #include "Tracer.h"
 #include "Surface.h"
 #include "Sphere.h"
+#include "SurfacePlane.h"
 
 #include <iostream>
 #include <string>
@@ -157,10 +158,14 @@ SurfaceList read_surfaces(std::istream& in)
 	std::string shape;
 	while (in >> shape) {
 		if (shape == "Sphere") {
-			double pos_x, pos_y, pos_z, color;
-			double r;
+			double pos_x, pos_y, pos_z, r, color;
 			in >> pos_x >> pos_y >> pos_z >> r >> color;
 			l.push_back(new Sphere {Vector {pos_x, pos_y, pos_z}, r, color});
+		} else if (shape == "Plane") {
+			double ux, uy, uz, vx, vy, vz, ox, oy, oz, color;
+			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz >> color;
+			l.push_back(new SurfacePlane 
+					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, color});
 		}
 	}
 

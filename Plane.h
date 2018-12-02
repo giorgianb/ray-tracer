@@ -2,6 +2,11 @@
 #define __RAY_TRACER_PLANE_INCLUDED
 
 #include "Vector.h"
+#include "Line.h"
+#include <utility>
+
+enum class LinePlaneIntersectionType {none, point, line};
+using LinePlaneIntersection = std::pair<LinePlaneIntersectionType, Vector>;
 
 class Plane {
 	private:
@@ -17,4 +22,5 @@ class Plane {
 
 Vector evaluate(const Plane& p, const double& s, const double& t);
 Vector normal(const Plane& p);
+LinePlaneIntersection intersection(const Plane& p, const Line& l);
 #endif

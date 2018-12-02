@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	};
 
 	const char *file_name {nullptr};
-	const char *output_file_name {"out.pgm"};
+	const char *output_file_name {"out.ppm"};
 	ResSpec resolution {1000, 1000};
 	double plane_offset {250};
 	Corner lower {-100, -100};
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 				"--eye-x, --eye-x=\t\tSpecifies x-coordinate of eye.\n"
 				"--eye-y, --eye-y=\t\tSpecifies y-coordinate of eye.\n"
 				"--eye-z, --eye-z=\t\tSpecifies z-coordinate of eye.\n"
-				"brightness, --brightness=\tSpecifies brightness.\n\n\n"
+				"--brightness, --brightness=\tSpecifies brightness.\n\n\n"
 				"If no input file is provided, shapes are read from standard input.";
 				std::cout << help_message << '\n';
 
@@ -149,13 +149,15 @@ int main(int argc, char *argv[]) {
 	} else
 		world = read_surfaces(std::cin);
 
-	const image traced {trace(world, eye, resolution, lower, upper, plane_offset, b)};
+	const PPMImage traced {trace(world, eye, resolution, lower, upper, plane_offset, b)};
 
 	std::ofstream out {output_file_name};
-	out << "P2 " << resolution.first << ' ' << resolution.second << ' ' << 255 << '\n';
+	out << "P3 " << resolution.first << ' ' << resolution.second << ' ' << 255 << '\n';
 	for (size_t j = 0; j < resolution.second; ++j)
 		for (size_t i = 0; i < resolution.first; ++i)
-			out << (int) traced[i][j] << '\n';
+			out << (int) traced[i][j].r << ' '
+				<< (int) traced[i][j].b << ' '
+				<< (int) traced[i][j].g << '\n';
 	return 0;
 }
 
@@ -165,14 +167,14 @@ SurfaceList read_surfaces(std::istream& in)
 	std::string shape;
 	while (in >> shape) {
 		if (shape == "Sphere") {
-			double pos_x, pos_y, pos_z, r, color;
-			in >> pos_x >> pos_y >> pos_z >> r >> color;
-			l.push_back(new Sphere {Vector {pos_x, pos_y, pos_z}, r, color});
+			double pos_x, pos_y, pos_z, radius, r, g, b;
+			in >> pos_x >> pos_y >> pos_z >> radius >> r >> g >> b;
+			l.push_back(new Sphere {Vector {pos_x, pos_y, pos_z}, radius, {r, g, b}});
 		} else if (shape == "Plane") {
-			double ux, uy, uz, vx, vy, vz, ox, oy, oz, color;
-			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz >> color;
+			double ux, uy, uz, vx, vy, vz, ox, oy, oz, r, g, b;
+			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz >> r >> g >> b;
 			l.push_back(new SurfacePlane 
-					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, color});
+					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, {r, g, b}});
 		}
 	}
 

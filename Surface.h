@@ -5,7 +5,9 @@
 #include "Vector.h"
 #include <vector>
 
-using Color = double;
+struct Color {
+	double r, g, b;
+};
 
 class Surface {
 	public:

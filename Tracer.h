@@ -6,12 +6,16 @@
 #include <vector>
 #include <utility>
 
-using image = std::vector<std::vector<unsigned char>>;
+struct PPMColor {
+	unsigned char r, g, b;
+};
+
+using PPMImage = std::vector<std::vector<PPMColor>>;
 
 using ResSpec = std::pair<size_t, size_t>;
 using Corner = std::pair<int, int>;
 
-image trace(const SurfaceList& world, 
+PPMImage trace(const SurfaceList& world, 
 		const Vector& eye,
 		const ResSpec& resolution, 
 		const Corner& c1, 

@@ -5,7 +5,7 @@
 #include <limits>
 #include <cmath>
 
-image trace(const SurfaceList& world, 
+PPMImage trace(const SurfaceList& world, 
 		const Vector& eye,
 		const ResSpec& resolution, 
 		const Corner& c1, 
@@ -21,9 +21,9 @@ image trace(const SurfaceList& world,
 	const double yscale {((double) (ymax - ymin))/resolution.second};
 
 	// automatically filled with zeroes
-	image traced;
+	PPMImage traced;
 	for (size_t i {0}; i < resolution.first; ++i)
-		traced.push_back(std::vector<unsigned char>(resolution.second));
+		traced.push_back(std::vector<PPMColor>(resolution.second));
 
 	for (size_t i {0}; i < resolution.first; ++i) {
 		const double x {xmin + i*xscale};
@@ -52,11 +52,17 @@ image trace(const SurfaceList& world,
 				const Vector h {hit->intersection(ray).second};
 				const Color sc {hit->color(h)};
 				const Vector dir {ray.direction()};
-				double intensity {std::abs(normalize(dir)*hit->normal(h, eye)) * sc};
-				intensity /= (magnitude(h - eye) * magnitude(h - eye));
-				intensity *= brightness;
-				intensity = std::min(255.0, std::round(intensity * 255));
-				traced[i][j] = std::max(0.0, intensity);
+				double ri {std::abs(normalize(dir)*hit->normal(h, eye)) * sc.r};
+				double bi {std::abs(normalize(dir)*hit->normal(h, eye)) * sc.b};
+				double gi {std::abs(normalize(dir)*hit->normal(h, eye)) * sc.g};
+				ri /= (magnitude(h - eye) * magnitude(h - eye));
+				ri = std::min(255.0, std::round(ri * brightness * 255));
+				bi /= (magnitude(h - eye) * magnitude(h - eye));
+				bi = std::min(255.0, std::round(bi * brightness * 255));
+				gi /= (magnitude(h - eye) * magnitude(h - eye));
+				gi = std::min(255.0, std::round(gi * brightness * 255));
+
+				traced[i][j] = {ri, bi, gi};
 			}
 		}
 	}

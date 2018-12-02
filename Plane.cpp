@@ -41,7 +41,7 @@ LinePlaneIntersection intersection(const Plane& p, const Line& l) {
 		}
 	};
 
-	const MaybeSolution s {solution(rref(am))};
+	const SolutionSet s {solution(rref(am))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			return {LinePlaneIntersectionType::point, evaluate(l, s.second[0][0])};

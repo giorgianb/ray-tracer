@@ -1,4 +1,4 @@
-#ifdef __RAY_TRACER_PLANE_INCLUDED
+#ifndef __RAY_TRACER_PLANE_INCLUDED
 #define __RAY_TRACER_PLANE_INCLUDED
 class Plane {
 	private:

@@ -4,6 +4,7 @@
 #include "Plane.h"
 #include "Surface.h"
 #include "Vector.h"
+#include "Linear.h"
 
 class SurfacePlane: public Surface {
 	private:

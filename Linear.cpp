@@ -90,7 +90,6 @@ SolutionSetType number_solutions(const AugmentedMatrix& am) {
 	const Matrix& a {am.second};
 	// check if there is a row in the form 0=1
 	for (size_t i {0}; i < m.size(); ++i) {
-		assert(m.size() <= m[i].size());
 		// check if row contains all zeroes besides non-augmented matrix
 		const bool zero_row {leading_zeroes(m[i]) == m[i].size()};
 		// check if augmented matrix contains a non-zero

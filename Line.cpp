@@ -43,7 +43,7 @@ LineLineIntersection intersection(const Line& l1, const Line& l2) {
 	const SolutionSet s {solution(rref(am))};
 	switch (s.first) {
 		case SolutionSetType::unique:
-			assert(std::fabs(s.second[2][0]) < ESP);
+			assert(std::fabs(s.second[2][0]) <= ESP);
 			return LineLineIntersection {LineLineIntersectionType::point, 
 				evaluate(l1, s.second[0][0])};
 		case SolutionSetType::infinite:

@@ -5,8 +5,8 @@
 #include "Plane.h"
 #include "Linear.h"
 #include <iostream>
-void print_vector(std::ostream& os, const Vector& v);
-void print_line(std::ostream& os, const Line& l);
-void print_plane(std::ostream& os, const Plane& p);
-void print_matrix(std::ostream& os, const Matrix& m);
+std::ostream& operator<<(std::ostream& os, const Vector& v);
+std::ostream& operator<<(std::ostream& os, const Line& l);
+std::ostream& operator<<(std::ostream& os, const Plane& p);
+std::ostream& operator<<(std::ostream& os, const Matrix& m);
 #endif

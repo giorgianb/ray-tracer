@@ -25,6 +25,43 @@ Vector normal(const ConvexPolygon& p) {
 	return normal(p.plane());
 }
 
+bool contains(const ConvexPolygon& p, const Vector& tp) {
+	std::vector<Vector> points {tp};
+	// find intersection of line with slope of edge perpendicular and offset of tp with edge
+	for (const auto& edge: p.edges()) {
+		const Line perp {normal(edge, normal(p.plane())), tp};
+		const LineLineIntersection pi {intersection(edge, perp)}; // polygon intersection
+		assert (pi.first == LineLineIntersectionType::point);
+		points.push_back(pi.second);
+	}
+
+	// Convert points to plane coordinates
+	const Vector tpp {points[0]}; // get tp's coordinate in the plane
+	std::vector<Vector> plane_points;
+	for (const auto& point: points) {
+		const AugmentedMatrix am {
+			{
+				{p.plane().u().x(), p.plane().v().x()},
+				{p.plane().u().y(), p.plane().v().y()},
+				{p.plane().u().z(), p.plane().v().z()}
+			},
+			{
+				{p.plane().offset().x() - tp.x()},
+				{p.plane().offset().y() - tp.y()},
+				{p.plane().offset().z() - tp.z()}
+			}
+		};
+		const SolutionSet s {solution(rref(am))};
+		assert(s.first == SolutionSetType::unique);
+		assert(std::fabs(s.second[2][0]) <= ESP);
+		plane_points.push_back({s.second[0][0], s.second[1][0], 0});
+	}
+	plane_points.push_back(plane_points.front()); // for the CH algorithm
+
+	const std::vector<Vector> ch {convex_hull(plane_points)};
+	return std::find(ch.begin(), ch.end(), tpp) == ch.end();
+}
+
 LineConvexPolygonIntersection intersection(const ConvexPolygon& p, const Line& l) {
 	const LinePlaneIntersection s {intersection(p.plane(), l)};
 	// Test if intersection is in the polygon's plane
@@ -37,43 +74,9 @@ LineConvexPolygonIntersection intersection(const ConvexPolygon& p, const Line& l
 			break;
 	}
 
-	// Test if point is inside polygon
-	const Vector ip {s.second}; // intersection point
-
-	std::vector<Vector> points {ip};
-	// find intersection of line with slope of edge perpendicular and offset of ip with edge
-	for (const auto& edge: p.edges()) {
-		const Line perp {normal(edge, normal(p.plane())), ip};
-		const LineLineIntersection pi {intersection(edge, perp)}; // polygon intersection
-		assert (pi.first == LineLineIntersectionType::point);
-		points.push_back(pi.second);
-	}
-
-	// Convert points to plane coordinates
-	const Vector ipp {points[0]}; // get ip's coordinate in the plane
-	std::vector<Vector> plane_points;
-	for (const auto& point: points) {
-		const AugmentedMatrix am {
-			{
-				{p.plane().u().x(), p.plane().v().x()},
-				{p.plane().u().y(), p.plane().v().y()},
-				{p.plane().u().z(), p.plane().v().z()}
-			},
-			{
-				{p.plane().offset().x() - ip.x()},
-				{p.plane().offset().y() - ip.y()},
-				{p.plane().offset().z() - ip.z()}
-			}
-		};
-		const SolutionSet s {solution(rref(am))};
-		assert(s.first == SolutionSetType::unique);
-		assert(std::fabs(s.second[2][0]) <= ESP);
-		plane_points.push_back({s.second[0][0], s.second[1][0], 0});
-	}
-	plane_points.push_back(plane_points.front()); // for the CH algorithm
-
-	const std::vector<Vector> ch {convex_hull(plane_points)};
-	if (std::find(ch.begin(), ch.end(), ipp) != ch.end())
+	// get intersection point 
+	const Vector ip {s.second};
+	if (contains(p, ip))
 		return {LineConvexPolygonIntersectionType::point, ip};
 	else
 		return {LineConvexPolygonIntersectionType::none, {0, 0, 0}};

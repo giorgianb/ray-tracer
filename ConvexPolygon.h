@@ -21,5 +21,6 @@ class ConvexPolygon {
 };
 
 Vector normal(const ConvexPolygon& p);
+bool contains(const ConvexPolygon& p, const Vector& tp);
 LineConvexPolygonIntersection intersection(const ConvexPolygon& p, const Line& l);
 #endif

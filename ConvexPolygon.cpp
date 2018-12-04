@@ -25,13 +25,17 @@ Vector normal(const ConvexPolygon& p) {
 	return normal(p.plane());
 }
 
+//#include "debug.h"
 bool contains(const ConvexPolygon& p, const Vector& tp) {
 	std::vector<Vector> points {tp};
 	// find intersection of line with slope of edge perpendicular and offset of tp with edge
 	for (const auto& edge: p.edges()) {
 		const Line perp {normal(edge, normal(p.plane())), tp};
 		const LineLineIntersection pi {intersection(edge, perp)}; // polygon intersection
-		assert (pi.first == LineLineIntersectionType::point);
+		// TODO: figure out what to do if it's a line
+		if (pi.first == LineLineIntersectionType::none)
+			return false;
+
 		points.push_back(pi.second);
 	}
 
@@ -46,19 +50,36 @@ bool contains(const ConvexPolygon& p, const Vector& tp) {
 				{p.plane().u().z(), p.plane().v().z()}
 			},
 			{
-				{p.plane().offset().x() - tp.x()},
-				{p.plane().offset().y() - tp.y()},
-				{p.plane().offset().z() - tp.z()}
+				{-p.plane().offset().x() + point.x()},
+				{-p.plane().offset().y() + point.y()},
+				{-p.plane().offset().z() + point.z()}
 			}
 		};
+//		std::cout << "coordinate matrix: " << '\n';
+//		std::cout << am.first << '\n' << am.second << '\n';
 		const SolutionSet s {solution(rref(am))};
 		assert(s.first == SolutionSetType::unique);
 		assert(std::fabs(s.second[2][0]) <= ESP);
-		plane_points.push_back({s.second[0][0], s.second[1][0], 0});
+		const Vector planepoint {s.second[0][0], s.second[1][0], 0};
+//		std::cout << "coordinate matrix solution: " << '\n';
+//		std::cout << am.first << '\n' << am.second << '\n';
+//		std::cout << "coordinate of " << point << " in plane " << p.plane() << ": ";
+//		std::cout << planepoint << '\n';
+		plane_points.push_back(planepoint);
 	}
-	plane_points.push_back(plane_points.front()); // for the CH algorithm
+//	plane_points.push_back(plane_points.front()); // for the CH algorithm
 
+//	std::cout << "without hull: ";
+//	for (const auto& p: plane_points)
+//		std::cout << p << ' ';
+//	std::cout << '\n';
 	const std::vector<Vector> ch {convex_hull(plane_points)};
+
+//	std::cout << "with hull: ";
+//	for (const auto& p: ch)
+//		std::cout << p << ' ';
+//	std::cout << '\n';
+
 	return std::find(ch.begin(), ch.end(), tpp) == ch.end();
 }
 
@@ -106,14 +127,30 @@ std::vector<Vector> convex_hull(std::vector<Vector> P) {
 
 			return std::atan2(d1.y(), d1.x()) < std::atan2(d2.y(), d2.x());
 	});
+//	std::cout << "sorted with respected to pivot: ";
+//	for (const auto& p: P)
+//		std::cout << p << ' ';
+//	std::cout << '\n';
 
 	std::vector<Vector> S {P[n - 1], P[0], P[1]};
+
 	size_t i {2};
 	while (i < n) {
 		size_t j {S.size() - 1};
+		assert(S.size() > 1);
 		// test if ccw(S[j - 1], S[j], P[i]
-		// (p - q) x (p - r) > 0
-		if (magnitude((S[j-1] - S[j]) % (S[j - 1] - P[i])) > 0)
+		// (q - p) x (r - p) > 0
+		bool ccw {((S[j] - S[j-1]) % (P[i] - S[j-1])).z() > 0};
+
+//		std::cout << P[i] << " to the left of " << S[j-1] << " -> " << S[j] << ": ";
+//		std::cout << ccw << '\n';
+		const Vector v1 {S[j] - S[j-1]};
+		const Vector v2 {P[i] - P[i - 1]};
+//		std::cout << v1 << "x" << v2 << " = " << magnitude(v1 % v2) << '\n';
+
+		
+
+		if (ccw)		
 			S.push_back(P[i++]);
 		else
 			S.pop_back();

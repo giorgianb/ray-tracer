@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "Debug.h"
 std::ostream& operator<<(std::ostream& os, const Matrix& m) {
 	for (size_t i {0}; i < m.size(); ++i) {
 		for (size_t j {0}; j < m[i].size(); ++j)

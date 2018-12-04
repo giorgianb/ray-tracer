@@ -28,7 +28,7 @@ PPMImage trace(const SurfaceList& world,
 	for (size_t i {0}; i < resolution.first; ++i) {
 		const double x {xmin + i*xscale};
 		for (size_t j {0}; j < resolution.second; ++j) {
-			const double y {ymin + j*yscale};
+			const double y {ymax - j*yscale};
 
 			// Ray from our eye to our current (x, y)
 			const Vector to_plane {Vector {x, y, plane_offset + eye.z()} - eye};

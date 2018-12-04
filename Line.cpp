@@ -26,6 +26,7 @@ Vector normal(const Line& l, const Vector& v) {
 }
 
 
+//#include "debug.h"
 LineLineIntersection intersection(const Line& l1, const Line& l2) {
 	const AugmentedMatrix am {
 		{
@@ -34,21 +35,25 @@ LineLineIntersection intersection(const Line& l1, const Line& l2) {
 			{l1.direction().z(), -l2.direction().z()},
 		},
 		{
-			{l1.offset().x() - l2.offset().x()},
-			{l1.offset().y() - l2.offset().y()},
-			{l1.offset().z() - l2.offset().z()},
+			{-l1.offset().x() + l2.offset().x()},
+			{-l1.offset().y() + l2.offset().y()},
+			{-l1.offset().z() + l2.offset().z()},
 		}
 	};
 
+//	std::cout << "intersection: " << l1 << " and " << l2 << ": ";
 	const SolutionSet s {solution(rref(am))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			assert(std::fabs(s.second[2][0]) <= ESP);
+//			std::cout << evaluate(l1, s.second[0][0]) << '\n';
 			return LineLineIntersection {LineLineIntersectionType::point, 
 				evaluate(l1, s.second[0][0])};
 		case SolutionSetType::infinite:
+//			std::cout << "infinite\n";
 			return LineLineIntersection {LineLineIntersectionType::line, {0, 0, 0}};
 		case SolutionSetType::none:
+//			std::cout << "none\n";
 			return LineLineIntersection {LineLineIntersectionType::none, {0, 0, 0}};
 	}
 }

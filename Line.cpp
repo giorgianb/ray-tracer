@@ -52,7 +52,6 @@ LineLineIntersection intersection(const Line& l1, const Line& l2) {
 	}
 }
 
-
 LineVectorIntersection intersection(const Line& l, const Vector& v) {
 	const AugmentedMatrix am {
 		{

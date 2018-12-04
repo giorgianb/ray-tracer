@@ -25,25 +25,17 @@ Vector normal(const ConvexPolygon& p) {
 	return normal(p.plane());
 }
 
-#include "debug.h"
 bool contains(const ConvexPolygon& p, const Vector& tp) {
 	std::vector<Vector> points {tp};
 	// find intersection of line with slope of edge perpendicular and offset of tp with edge
 	for (const auto& edge: p.edges()) {
-		if (intersection(edge, tp).first != LineVectorIntersectionType::none) {
-			if (false)
-				std::cout << edge << " intersects " << tp << '\n';
+		if (intersection(edge, tp).first != LineVectorIntersectionType::none)
 			return false;
-		}
 
 		const Line perp {normal(edge, normal(p.plane())), tp};
 		const LineLineIntersection pi {intersection(edge, perp)}; // polygon intersection
-		// TODO: figure out what to do if it's a line
-		if (pi.first == LineLineIntersectionType::none) {
-			if (false)
-				std::cout << perp << " doesn't intersects " << tp << '\n';
+		if (pi.first != LineLineIntersectionType::point)
 			return false;
-		}
 
 		points.push_back(pi.second);
 	}
@@ -63,56 +55,25 @@ bool contains(const ConvexPolygon& p, const Vector& tp) {
 				{-p.plane().offset().z() + point.z()}
 			}
 		};
-		if (false) {
-			std::cout << "coordinate matrix: " << '\n';
-			std::cout << am.first << am.second;
-		}
+
 		const SolutionSet s {solution(rref(am))};
 		assert(s.first == SolutionSetType::unique);
 		assert(std::fabs(s.second[2][0]) <= ESP);
-		const Vector planepoint {s.second[0][0], s.second[1][0], 0};
-		if (false) {
-			std::cout << "coordinate matrix solution: " << '\n';
-			std::cout << am.first << am.second;
-		}
-
-		if (false) {
-			std::cout << "coordinate of " << point << " in plane " << p.plane() << ": ";
-			std::cout << planepoint << '\n';
-		}
-		plane_points.push_back(planepoint);
+		plane_points.push_back({s.second[0][0], s.second[1][0], 0});
 	}
 
 	const Vector tpp {plane_points[0]}; // get tp's coordinate in the plane
-//	plane_points.push_back(plane_points.front()); // for the CH algorithm
 
 	// remove duplicate points
 	std::sort(plane_points.begin(), plane_points.end());
 	auto last = std::unique(plane_points.begin(), plane_points.end());
 	plane_points.erase(last, plane_points.end());
 
-	if (false) {
-		std::cout << "without hull: ";
-		for (const auto& p: plane_points)
-			std::cout << p << ' ';
-		std::cout << '\n';
-	}
 	const std::vector<Vector> ch {convex_hull(plane_points)};
-
-	if (false) {
-		std::cout << "with hull: ";
-		for (const auto& p: ch)
-			std::cout << p << ' ';
-		std::cout << '\n';
-	}
 	for (size_t i {0}; i < ch.size() - 1; ++i) {
 		const Line edge {ch[i + 1] - ch[i], ch[i]};
-		if (intersection(edge, tpp).first != LineVectorIntersectionType::none) {
-			if (false)
-				std::cout << "after: " << edge << " intersects " << tpp << '\n';
-				 
+		if (intersection(edge, tpp).first != LineVectorIntersectionType::none)
 			return false;
-		}
 	}
 
 	return std::find(ch.begin(), ch.end(), tpp) == ch.end();
@@ -132,7 +93,6 @@ LineConvexPolygonIntersection intersection(const ConvexPolygon& p, const Line& l
 
 	// get intersection point 
 	const Vector ip {s.second};
-//	std::cout << "intersection(" << p.plane() << ", " << l << "): " << ip << '\n';
 	if (contains(p, ip))
 		return {LineConvexPolygonIntersectionType::point, ip};
 	else
@@ -177,10 +137,6 @@ std::vector<Vector> convex_hull(std::vector<Vector> P) {
 	std::swap(P[P0], P[0]);
 	pivot = P[0];
 	sort(P.begin() + 1, P.end(), anglecmp);
-//	std::cout << "sorted with respected to pivot: ";
-//	for (const auto& p: P)
-//		std::cout << p << ' ';
-//	std::cout << '\n';
 
 	std::vector<Vector> S {P[n - 1], P[0], P[1]};
 
@@ -190,17 +146,7 @@ std::vector<Vector> convex_hull(std::vector<Vector> P) {
 		assert(S.size() > 1);
 		// test if ccw(S[j - 1], S[j], P[i]
 		// (q - p) x (r - p) > 0
-		bool ccw {((S[j] - S[j-1]) % (P[i] - S[j-1])).z() > 0};
-
-//		std::cout << P[i] << " to the left of " << S[j-1] << " -> " << S[j] << ": ";
-//		std::cout << ccw << '\n';
-		const Vector v1 {S[j] - S[j-1]};
-		const Vector v2 {P[i] - P[i - 1]};
-//		std::cout << v1 << "x" << v2 << " = " << magnitude(v1 % v2) << '\n';
-
-		
-
-		if (ccw)		
+		if (((S[j] - S[j-1]) % (P[i] - S[j-1])).z() > 0)
 			S.push_back(P[i++]);
 		else
 			S.pop_back();

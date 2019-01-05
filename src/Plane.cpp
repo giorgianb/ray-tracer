@@ -1,5 +1,6 @@
 #include "Plane.h"
 #include "Linear.h"
+#include <utility>
 
 Plane::Plane(const Vector& u, const Vector& v, const Vector& offset):
 	_u {u},
@@ -28,7 +29,7 @@ Vector normal(const Plane& p) {
 }
 
 LinePlaneIntersection intersection(const Plane& p, const Line& l) {
-	const AugmentedMatrix am {
+	AugmentedMatrix am {
 		{
 			{l.direction().x(), -p.u().x(), -p.v().x()},
 			{l.direction().y(), -p.u().y(), -p.v().y()},
@@ -41,7 +42,7 @@ LinePlaneIntersection intersection(const Plane& p, const Line& l) {
 		}
 	};
 
-	const SolutionSet s {solution(rref(am))};
+	const SolutionSet s {solution(rref_in_place(std::move(am)))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			return {LinePlaneIntersectionType::point, evaluate(l, s.second[0][0])};

@@ -43,7 +43,7 @@ bool contains(const ConvexPolygon& p, const Vector& tp) {
 	// Convert points to plane coordinates
 	std::vector<Vector> plane_points;
 	for (const auto& point: points) {
-		const AugmentedMatrix am {
+		AugmentedMatrix am {
 			{
 				{p.plane().u().x(), p.plane().v().x()},
 				{p.plane().u().y(), p.plane().v().y()},
@@ -56,7 +56,7 @@ bool contains(const ConvexPolygon& p, const Vector& tp) {
 			}
 		};
 
-		const SolutionSet s {solution(rref(am))};
+		const SolutionSet s {solution(rref_in_place(std::move(am)))};
 		assert(s.first == SolutionSetType::unique);
 		assert(std::fabs(s.second[2][0]) <= ESP);
 		plane_points.push_back({s.second[0][0], s.second[1][0], 0});

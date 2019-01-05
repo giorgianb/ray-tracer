@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <utility>
 
 Matrix create_matrix(const size_t n, const size_t m) {
 	Matrix a;
@@ -21,18 +22,22 @@ size_t leading_zeroes(const Row& row) {
 	return row.size();
 }
 
-
-Matrix rref(const Matrix& m) {
+Matrix rref_in_place(Matrix&& m) {
 	AugmentedMatrix am {m, create_matrix(m.size(), 1)};
-	return rref(am).first;
+	return rref(std::move(am)).first;
 }
 
-AugmentedMatrix rref(const AugmentedMatrix& am) {
+
+Matrix rref(Matrix m) {
+	return rref(std::move(m));
+}
+
+AugmentedMatrix rref_in_place(AugmentedMatrix&& am) {
 	// coefficients and augment need to have the same amount of rows
 	assert(am.first.size() == am.second.size());
 
-	Matrix m {am.first};
-	Matrix a {am.second};
+	Matrix m {std::move(am.first)};
+	Matrix a {std::move(am.second)};
 	// select row
 	for (size_t i {0}; i < m.size(); ++i) {
 		// find leading variable
@@ -81,6 +86,11 @@ AugmentedMatrix rref(const AugmentedMatrix& am) {
 	}
 
 	return {m, a};
+}
+
+
+AugmentedMatrix rref(AugmentedMatrix am) {
+	return rref_in_place(std::move(am));
 }
 
 SolutionSetType number_solutions(const AugmentedMatrix& am) {

@@ -26,7 +26,7 @@ Vector normal(const Line& l, const Vector& v) {
 }
 
 LineLineIntersection intersection(const Line& l1, const Line& l2) {
-	const AugmentedMatrix am {
+	AugmentedMatrix am {
 		{
 			{l1.direction().x(), -l2.direction().x()},
 			{l1.direction().y(), -l2.direction().y()},
@@ -39,7 +39,7 @@ LineLineIntersection intersection(const Line& l1, const Line& l2) {
 		}
 	};
 
-	const SolutionSet s {solution(rref(am))};
+	const SolutionSet s {solution(rref_in_place(std::move(am)))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			assert(std::fabs(s.second[2][0]) <= ESP);
@@ -53,7 +53,7 @@ LineLineIntersection intersection(const Line& l1, const Line& l2) {
 }
 
 LineVectorIntersection intersection(const Line& l, const Vector& v) {
-	const AugmentedMatrix am {
+	AugmentedMatrix am {
 		{
 			{l.direction().x()},
 			{l.direction().y()},
@@ -66,7 +66,7 @@ LineVectorIntersection intersection(const Line& l, const Vector& v) {
 		}
 	};
 
-	const SolutionSet s {solution(rref(am))};
+	const SolutionSet s {solution(rref_in_place(std::move(am)))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			assert(std::fabs(s.second[2][0]) <= ESP);

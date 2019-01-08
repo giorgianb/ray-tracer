@@ -12,7 +12,7 @@ Polygon::Polygon(const Plane& p, const PointSet& vertices): _plane {p}, _edges {
 		const LineSegment edge {vertices[i], vertices[i + 1]};
 		auto [type, sol] = intersection(p, edge.line());
 		if (type == LinePlaneIntersectionType::line)
-			edges.push_back(edge);
+			_edges.push_back(edge);
 	}
 }
 

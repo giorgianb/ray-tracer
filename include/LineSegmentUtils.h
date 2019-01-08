@@ -7,5 +7,5 @@ MaybeVector evaluate(const LineSegment& ls, const double& s);
 Vector normal(const LineSegment& ls, const Vector& v);
 Intersection intersection(const LineSegment& ls, const Line& l);
 Intersection intersection(const LineSegment& ls, const Vector& v);
-
+Intersection intersection(const LineSegment& ls, const Ray& r);
 #endif

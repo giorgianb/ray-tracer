@@ -27,4 +27,3 @@ Vector SurfacePolygon::normal(const Vector& point, const Vector& light) const {
 Color SurfacePolygon::color(const Vector& point) const {
 	return _color;
 }
-

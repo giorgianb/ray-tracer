@@ -3,7 +3,6 @@
 
 #include "Vector.h"
 #include "Line.h"
-#include <utility>
 
 class LineSegment {
 	private:

@@ -1,0 +1,8 @@
+Change rref_in_place(AugmentedMatix&&) to rref_in_place(AugmentedMatrix&)
+Use C++17 unpacking to clean up code
+Make rref a constexpr
+Make MaybeVector an std::optional<Vector>
+Make constructors constexpr
+Make as much as possible constexpr (which should be pretty much everything)
+Make many more things noexcept
+Make header file formatting more consistent

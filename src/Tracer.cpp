@@ -4,6 +4,7 @@
 
 #include <limits>
 #include <cmath>
+#include <iostream>
 
 PPMImage trace(const SurfaceList& world, 
 		const Vector& eye,
@@ -27,6 +28,7 @@ PPMImage trace(const SurfaceList& world,
 
 	for (size_t i {0}; i < resolution.first; ++i) {
 		const double x {xmin + i*xscale};
+		std::cout << "Progress: " << (100.0 * i)/(resolution.first) << "%\n";
 		for (size_t j {0}; j < resolution.second; ++j) {
 			const double y {ymax - j*yscale};
 

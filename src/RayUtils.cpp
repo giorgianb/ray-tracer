@@ -38,4 +38,3 @@ Intersection intersection(const Ray& r, const Vector& v) {
 
 	}
 }
-

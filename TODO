@@ -6,3 +6,6 @@ Make constructors constexpr
 Make as much as possible constexpr (which should be pretty much everything)
 Make many more things noexcept
 Make header file formatting more consistent
+Make (const Line& ray) a (const Ray& ray) in Surface*
+Make more class member const or constexpr
+Make read_surfaces throw an exception on syntax error

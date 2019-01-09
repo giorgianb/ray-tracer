@@ -18,7 +18,7 @@ Intersection intersection(const Ray& r, const Line& l) {
 		case LineLineIntersectionType::none:
 			return EmptySet {};
 		case LineLineIntersectionType::point:
-			return ((r.offset() - sol) * r.direction()) >= 0 ?
+			return ((sol - r.offset()) * r.direction()) >= 0 ?
 				Intersection {sol} : Intersection {EmptySet {}};
 		case LineLineIntersectionType::line:
 			return r;

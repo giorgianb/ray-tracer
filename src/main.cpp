@@ -4,6 +4,7 @@
 #include "SurfacePlane.h"
 #include "Line.h"
 #include "SurfaceConvexPolygon.h"
+#include "SurfacePolygon.h"
 
 #include <iostream>
 #include <vector>
@@ -197,6 +198,25 @@ SurfaceList read_surfaces(std::istream& in)
 			double r, g, b;
 			in >> r >> g >> b;
 			l.push_back(new SurfaceConvexPolygon {{base, edges}, {r, g, b}});
+		} else if (shape == "Polygon") {
+			double ux, uy, uz, vx, vy, vz, ox, oy, oz;
+
+			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz;
+			const Plane base {{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}};
+
+			size_t nvertices;
+			in >> nvertices;
+
+			PointSet vertices;
+			for (size_t i {0}; i < nvertices; ++i) {
+				double vx, vy, vz;
+				in >> vx >> vy >> vz;
+				vertices.push_back({vx, vy, vz});
+			}
+
+			double r, g, b;
+			in >> r >> g >> b;
+			l.push_back(new SurfacePolygon {{base, vertices}, {r, g, b}});
 		}
 	}
 

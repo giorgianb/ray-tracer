@@ -33,7 +33,7 @@ Intersection intersection(const Ray& r, const Vector& v) {
 		case LineVectorIntersectionType::none:
 			return EmptySet {};
 		case LineVectorIntersectionType::point:
-			return ((r.offset() - sol) * r.direction()) >= 0 ?
+			return ((sol - r.offset()) * r.direction()) >= 0 ?
 				Intersection {sol} : Intersection {EmptySet {}};
 
 	}

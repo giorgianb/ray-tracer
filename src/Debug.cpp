@@ -21,6 +21,17 @@ std::ostream& operator<<(std::ostream& os, const Line& l) {
 	return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const LineSegment& ls) {
+	os << ls.line() << " [" << ls.begin() << ", " << ls.end() << ']';
+
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Ray& r) {
+	os << 's' << r.direction() << " + " << r.offset() << " (s >= 0)";
+
+	return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const Plane& p) {
 	os << 's' << p.u() << " + t" << p.v() << " + " << p.offset();

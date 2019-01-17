@@ -6,12 +6,8 @@ Vector normal(const Polygon& p) {
 }
 
 Intersection intersection(const Polygon& p, const Vector& tp) {
-	// TODO: Test if tp is in the Polygon's plane using intersection(Plane, Vector)
-	// Waiting for Plane to acquire such a method
-	// Workaround: Testing if line segment from tp to plane offset is in plane
-	const Line l {p.plane().u(), tp};
-	auto [type, sol] = intersection(p.plane(), l);
-	if (type != LinePlaneIntersectionType::line)
+	auto [type, sol] = intersection(p.plane(), tp);
+	if (type != PointPlaneIntersectionType::point)
 		return EmptySet {}; // tp not in polygon's plane
 
 	size_t count {0};

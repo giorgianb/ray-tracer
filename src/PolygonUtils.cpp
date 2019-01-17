@@ -1,6 +1,5 @@
 #include "PolygonUtils.h"
 #include "LineSegmentUtils.h"
-#include "ConvexPolygon.h"
 
 Vector normal(const Polygon& p) {
 	return normal(p.plane());

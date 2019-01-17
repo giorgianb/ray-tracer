@@ -1,10 +1,6 @@
 #include "LineSegmentUtils.h"
 #include "RayUtils.h"
 
-#include <cassert>
-#include "Debug.h"
-#include <iostream>
-
 MaybeVector evaluate(const LineSegment& ls, const double& s) {
 	const Vector v {evaluate(ls.line(), s)};
 

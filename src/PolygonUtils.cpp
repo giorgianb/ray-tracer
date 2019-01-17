@@ -2,8 +2,6 @@
 #include "LineSegmentUtils.h"
 #include "ConvexPolygon.h"
 
-#include "Debug.h"
-
 Vector normal(const Polygon& p) {
 	return normal(p.plane());
 }

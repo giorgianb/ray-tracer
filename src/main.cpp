@@ -221,7 +221,6 @@ SurfaceList read_surfaces(std::istream& in)
 
 			double r, g, b;
 			in >> r >> g >> b;
-
 			l.push_back(new SurfacePolygon {{base, vertices}, {r, g, b}});
 		}
 	}

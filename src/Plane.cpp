@@ -2,6 +2,8 @@
 #include "Linear.h"
 #include <utility>
 
+#include <cassert>
+
 Plane::Plane(const Vector& u, const Vector& v, const Vector& offset):
 	_u {u},
 	_v {v},
@@ -26,6 +28,33 @@ Vector evaluate(const Plane& p, const double& s, const double& t) {
 
 Vector normal(const Plane& p) {
 	return normalize(p.u() % p.v());
+}
+
+
+PointPlaneIntersection intersection(const Plane& p, const Vector& tp) {
+	AugmentedMatrix am {
+		{
+			{p.u().x(), p.v().x()},
+			{p.u().y(), p.v().y()},
+			{p.u().z(), p.v().z()}
+		},
+		{
+			{tp.x() - p.offset().x()},
+			{tp.y() - p.offset().y()},
+			{tp.z() - p.offset().z()}
+		}
+	};
+
+	const SolutionSet s {solution(rref_in_place(std::move(am)))};
+	switch (s.first) {
+		case SolutionSetType::unique:
+			return {PointPlaneIntersectionType::point, tp};
+		case SolutionSetType::infinite:
+			assert(false);
+			return {PointPlaneIntersectionType::none, {0, 0, 0}};
+		case SolutionSetType::none:
+			return {PointPlaneIntersectionType::none, {0, 0, 0}};
+	}
 }
 
 LinePlaneIntersection intersection(const Plane& p, const Line& l) {

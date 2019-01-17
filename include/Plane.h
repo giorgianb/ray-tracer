@@ -5,6 +5,9 @@
 #include "Line.h"
 #include <utility>
 
+enum class PointPlaneIntersectionType {none, point};
+using PointPlaneIntersection = std::pair<PointPlaneIntersectionType, Vector>;
+
 enum class LinePlaneIntersectionType {none, point, line};
 using LinePlaneIntersection = std::pair<LinePlaneIntersectionType, Vector>;
 
@@ -22,5 +25,6 @@ class Plane {
 
 Vector evaluate(const Plane& p, const double& s, const double& t);
 Vector normal(const Plane& p);
+PointPlaneIntersection intersection(const Plane& p, const Vector& tp);
 LinePlaneIntersection intersection(const Plane& p, const Line& l);
 #endif

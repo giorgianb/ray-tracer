@@ -1,5 +1,8 @@
 #include "Vector.h"
 #include <cmath>
+// TODO: Remove in debug
+#include <iostream>
+#include "Debug.h"
 
 Vector::Vector(const double x, const double y, const double z): 
 	_x {x}, 
@@ -98,7 +101,12 @@ Vector operator%(const Vector& v1, const Vector& v2) {
 }
 
 bool operator==(const Vector& v1, const Vector& v2) {
-	return v1.x() == v2.x() && v1.y() == v2.y() && v1.z() == v2.z();
+	constexpr double ESP {1e-9};
+	const Vector v {v1 - v2};
+
+	return fabs(v.x()) <= ESP && fabs(v.y()) <= ESP && fabs(v.z()) <= ESP;
+
+//	return v1.x() == v2.x() && v1.y() == v2.y() && v1.z() == v2.z();
 }
 
 bool operator!=(const Vector& v1, const Vector& v2) {
@@ -106,9 +114,18 @@ bool operator!=(const Vector& v1, const Vector& v2) {
 }
 
 bool operator<(const Vector& v1, const Vector& v2) {
-	return v1.x() < v2.x()
-		|| (v1.x() == v2.x() && v1.y() < v2.y())
-		|| (v1.x() == v2.x() && v1.y() == v2.y() && v1.z() < v2.z());
+	// TODO: use a global ESP
+	constexpr double ESP {1e-9};
+	const Vector v {v1 - v2};
+
+	const double diffs[3] {v.x(), v.y(), v.z()};
+	for (const auto& d: diffs)
+		if (fabs(d) >= ESP)
+			return d < 0;
+
+//	return v1.x() < v2.x()
+//		|| (v1.x() == v2.x() && v1.y() < v2.y())
+//		|| (v1.x() == v2.x() && v1.y() == v2.y() && v1.z() < v2.z());
 }
 
 bool operator<=(const Vector& v1, const Vector& v2) {
@@ -117,10 +134,12 @@ bool operator<=(const Vector& v1, const Vector& v2) {
 
 bool operator>(const Vector& v1, const Vector& v2) {
 	return !(v1 <= v2);
+
 }
 
 bool operator>=(const Vector& v1, const Vector& v2) {
 	return v1 > v2 || v1 == v2;
+
 }
 
 double magnitude(const Vector& v)  {

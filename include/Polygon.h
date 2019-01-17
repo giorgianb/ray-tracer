@@ -13,6 +13,7 @@ class Polygon {
 	private:
 		const Plane _plane;
 		LineSegmentSet _edges;
+		PointSet _vertices;
 	public:
 		Polygon(const Plane& p, const PointSet& vertices);
 		Plane plane() const;

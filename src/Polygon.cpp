@@ -5,15 +5,13 @@
 
 #include <cassert>
 
-Polygon::Polygon(const Plane& p, const PointSet& vertices): _plane {p}, _edges {} {
-	// TODO: Fix by testing if each individual vertex is in the plane and filter out those
-	// that aren't. Waiting for Plane to have an intersection(Plane, Vector) method
-	for (size_t i {0}; i < vertices.size() - 1; ++i) {
-		const LineSegment edge {vertices[i], vertices[i + 1]};
-		auto [type, sol] = intersection(p, edge.line());
-		if (type == LinePlaneIntersectionType::line)
-			_edges.push_back(edge);
-	}
+Polygon::Polygon(const Plane& p, const PointSet& vertices): _plane {p}, _edges {}, _vertices {} {
+	for (const auto& v: vertices)
+		if (intersection(p, v).first == PointPlaneIntersectionType::point)
+			_vertices.push_back(v);
+
+	for (size_t i {0}; _vertices.size() > 0 && i < _vertices.size() - 1; ++i)
+		_edges.push_back({_vertices[i], _vertices[i + 1]});
 }
 
 Plane Polygon::plane() const {
@@ -25,9 +23,5 @@ LineSegmentSet Polygon::edges() const {
 }
 
 PointSet Polygon::vertices() const {
-	PointSet vertices {};
-	for (const auto& e: _edges)
-		vertices.push_back(e.begin());
-
-	return vertices;
+	return _vertices;
 }

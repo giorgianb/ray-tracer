@@ -44,7 +44,7 @@ Intersection intersection(const LineSegment& ls, const Vector& v) {
 	}
 }
 
-Intersection intersection_impl(const LineSegment& ls, const Ray& r) {
+Intersection intersection(const LineSegment& ls, const Ray& r) {
 	const Intersection inter {intersection(r, ls.line())};
 
 	if (auto sol = std::get_if<Vector>(&inter))
@@ -80,15 +80,4 @@ Intersection intersection_impl(const LineSegment& ls, const Ray& r) {
 		return ret;
 	} else
 		return EmptySet {};
-}
-
-Intersection intersection(const LineSegment& ls, const Ray& r) {
-	const Intersection inter {intersection_impl(ls, r)};
-
-	if (auto sol = std::get_if<Vector>(&inter)) {
-		const bool ok {*sol >= ls.begin() && *sol <= ls.end()};
-		std::cerr << ls.begin() << " <= " << *sol << " <= " << ls.end() << '\n';
-	}
-
-	return inter;
 }

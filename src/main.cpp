@@ -14,6 +14,10 @@
 #include <fstream>
 #include <getopt.h>
 
+// TODO: remove, only included for debugging purposes
+#include <set>
+#include "Debug.h"
+
 SurfaceList read_surfaces(std::istream& in);
 
 enum command_line_options
@@ -214,8 +218,50 @@ SurfaceList read_surfaces(std::istream& in)
 				vertices.push_back({vx, vy, vz});
 			}
 
+
 			double r, g, b;
 			in >> r >> g >> b;
+
+			const Polygon tmp {base, vertices};
+			const PointSet p_vertices {tmp.vertices()};
+
+			const std::set<Vector> test_set {p_vertices.begin(), p_vertices.end()};
+			if (test_set.size() <= 2) {
+				std::cerr << "SIZE: " << test_set.size() << '\n';
+				std::cerr << "raw: ";
+				for (const auto& t: vertices)
+					std::cerr << t << ' ';
+				std::cerr << '\n';
+
+				std::cerr << "filtered: ";
+				for (const auto& t: p_vertices)
+					std::cerr << t << ' ';
+				std::cerr << '\n';
+
+				std::cerr << "filtered+unique: ";
+				for (const auto& t: test_set)
+					std::cerr << t << ' ';
+				std::cerr << '\n';
+
+				std::cerr << "line segments: ";
+				for (const auto& t: tmp.edges())
+					std::cerr << t << '\n';
+
+
+				continue;
+			}
+
+			std::cerr << "Polygon Vertices:\n";
+			for (const auto& t: tmp.vertices())
+				std::cerr << t << ' ';
+			std::cerr << '\n';
+
+			std::cerr << "Polygon Edges:\n";
+			for (const auto& t: tmp.edges())
+				std::cerr << t << '\n';
+			std::cerr << '\n';
+
+
 			l.push_back(new SurfacePolygon {{base, vertices}, {r, g, b}});
 		}
 	}

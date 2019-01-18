@@ -45,7 +45,7 @@ PointPlaneIntersection intersection(const Plane& p, const Vector& tp) {
 		}
 	};
 
-	const SolutionSet s {solution(rref_in_place(std::move(am)))};
+	const SolutionSet s {solution(rref_in_place(am))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			return {PointPlaneIntersectionType::point, tp};
@@ -71,7 +71,7 @@ LinePlaneIntersection intersection(const Plane& p, const Line& l) {
 		}
 	};
 
-	const SolutionSet s {solution(rref_in_place(std::move(am)))};
+	const SolutionSet s {solution(rref_in_place(am))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			return {LinePlaneIntersectionType::point, evaluate(l, s.second[0][0])};

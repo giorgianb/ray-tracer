@@ -56,7 +56,7 @@ bool contains(const ConvexPolygon& p, const Vector& tp) {
 			}
 		};
 
-		const SolutionSet s {solution(rref_in_place(std::move(am)))};
+		const SolutionSet s {solution(rref_in_place(am))};
 		assert(s.first == SolutionSetType::unique);
 		assert(std::fabs(s.second[2][0]) <= ESP);
 		plane_points.push_back({s.second[0][0], s.second[1][0], 0});

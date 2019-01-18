@@ -22,22 +22,58 @@ size_t leading_zeroes(const Row& row) {
 	return row.size();
 }
 
-Matrix rref_in_place(Matrix&& m) {
-	AugmentedMatrix am {m, create_matrix(m.size(), 1)};
-	return rref(std::move(am)).first;
+Matrix& rref_in_place(Matrix& m) {
+	// select row
+	for (size_t i {0}; i < m.size(); ++i) {
+		// find leading variable
+		size_t leading {leading_zeroes(m[i])};
+		if (leading != m[i].size()) {
+			// scale row to one
+			double s {m[i][leading]};
+			for (size_t j {0}; j < m[i].size(); ++j)
+				m[i][j] /= s;
+
+			// subtract from other rows
+			for (size_t j {0}; j < m.size(); ++j) {
+				if (i == j)
+					continue;
+
+				double s {m[j][leading]};
+				for (size_t k {0}; k < m[j].size(); ++k)
+					m[j][k] -= s * m[i][k];
+			}
+		}
+	}
+
+	using Key = std::pair<size_t, Row>;
+	std::vector<Key> m_to_sort;
+	for (size_t i {0}; i < m.size(); ++i) {
+		size_t nzeroes {leading_zeroes(m[i])};
+		m_to_sort.push_back({nzeroes, std::move(m[i])});
+	}
+
+	std::sort(m_to_sort.begin(), m_to_sort.end(), [](const Key& k1, const Key& k2) {
+			return k1.first < k2.first;
+	});
+
+	for (size_t i {0}; i < m.size(); ++i)
+		m[i] = std::move(m_to_sort[i].second);
+
+	return m;
+
 }
 
 
 Matrix rref(Matrix m) {
-	return rref(std::move(m));
+	return rref(m);
 }
 
-AugmentedMatrix rref_in_place(AugmentedMatrix&& am) {
+AugmentedMatrix& rref_in_place(AugmentedMatrix& am) {
 	// coefficients and augment need to have the same amount of rows
 	assert(am.first.size() == am.second.size());
 
-	Matrix m {std::move(am.first)};
-	Matrix a {std::move(am.second)};
+	Matrix& m {am.first};
+	Matrix& a {am.second};
 	// select row
 	for (size_t i {0}; i < m.size(); ++i) {
 		// find leading variable
@@ -85,12 +121,12 @@ AugmentedMatrix rref_in_place(AugmentedMatrix&& am) {
 		a[i] = std::move(a_to_sort[i].second);
 	}
 
-	return {m, a};
+	return am;
 }
 
 
 AugmentedMatrix rref(AugmentedMatrix am) {
-	return rref_in_place(std::move(am));
+	return rref_in_place(am);
 }
 
 SolutionSetType number_solutions(const AugmentedMatrix& am) {

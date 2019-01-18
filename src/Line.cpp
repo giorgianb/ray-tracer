@@ -39,7 +39,7 @@ LineLineIntersection intersection(const Line& l1, const Line& l2) {
 		}
 	};
 
-	const SolutionSet s {solution(rref_in_place(std::move(am)))};
+	const SolutionSet s {solution(rref_in_place(am))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			assert(std::fabs(s.second[2][0]) <= ESP);
@@ -66,7 +66,7 @@ LineVectorIntersection intersection(const Line& l, const Vector& v) {
 		}
 	};
 
-	const SolutionSet s {solution(rref_in_place(std::move(am)))};
+	const SolutionSet s {solution(rref_in_place(am))};
 	switch (s.first) {
 		case SolutionSetType::unique:
 			assert(std::fabs(s.second[2][0]) <= ESP);

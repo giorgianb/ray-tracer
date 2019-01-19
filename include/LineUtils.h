@@ -6,21 +6,21 @@
 
 #include <cmath>
 
-constexpr Vector evaluate(const Line& l, const double& s);
-constexpr Vector normal(const Line& l, const Vector& v);
-constexpr Intersection intersection(const Line& l1, const Line& l2);
-constexpr Intersection intersection(const Line& l, const Vector& v);
+constexpr Vector evaluate(const Line& l, const double& s) noexcept;
+constexpr Vector normal(const Line& l, const Vector& v) noexcept;
+constexpr Intersection intersection(const Line& l1, const Line& l2) noexcept;
+constexpr Intersection intersection(const Line& l, const Vector& v) noexcept;
 
 
-constexpr Vector evaluate(const Line& l, const double& s) {
+constexpr Vector evaluate(const Line& l, const double& s) noexcept {
 	return s*l.direction() + l.offset();
 }
 
-constexpr Vector normal(const Line& l, const Vector& v) {
+constexpr Vector normal(const Line& l, const Vector& v) noexcept {
 	return normalize(l.direction() % v);
 }
 
-constexpr Intersection intersection(const Line& l1, const Line& l2) {
+constexpr Intersection intersection(const Line& l1, const Line& l2) noexcept {
 	// Test if the lines are really the same
 	if (l1.offset() != l2.offset()) {
 		const Vector nd {normalize(l1.direction())};
@@ -52,7 +52,7 @@ constexpr Intersection intersection(const Line& l1, const Line& l2) {
 	return l1.offset() + e*s*(hm/km);
 }
 
-constexpr Intersection intersection(const Line& l, const Vector& v) {
+constexpr Intersection intersection(const Line& l, const Vector& v) noexcept {
 	if (l.offset() != v) {
 		const Vector nd1 {normalize(v - l.offset())};
 		const Vector nd2 {normalize(l.direction())};

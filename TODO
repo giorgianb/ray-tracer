@@ -1,5 +1,4 @@
-Change rref_in_place(AugmentedMatix&&) to rref_in_place(AugmentedMatrix&)
-Use C++17 unpacking to clean up code
+Get rid of as much rref usage as possible (it creates too many temporary matrices which are expensive to create)
 Make rref a constexpr
 Make MaybeVector an std::optional<Vector>
 Make constructors constexpr

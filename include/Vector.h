@@ -10,74 +10,74 @@ class Vector {
 		double _y;
 		double _z;
 	public:
-		constexpr Vector(const double x, const double y, const double z);
+		constexpr Vector(const double x, const double y, const double z) noexcept;
 
-		constexpr double x() const;
-		constexpr double y() const;
-		constexpr double z() const;
+		constexpr double x() const noexcept;
+		constexpr double y() const noexcept;
+		constexpr double z() const noexcept;
 
-		inline void x(const double x);
-		inline void y(const double y);
-		inline void z(const double z);
+		inline void x(const double x) noexcept;
+		inline void y(const double y) noexcept;
+		inline void z(const double z) noexcept;
 
-		constexpr Vector& operator+=(const Vector& v);
-		constexpr Vector& operator-=(const Vector& v);
-		constexpr Vector& operator*=(const double k);
-		constexpr Vector& operator/=(const double k);
+		constexpr Vector& operator+=(const Vector& v) noexcept;
+		constexpr Vector& operator-=(const Vector& v) noexcept;
+		constexpr Vector& operator*=(const double k) noexcept;
+		constexpr Vector& operator/=(const double k) noexcept;
 };
 
-constexpr double operator*(const Vector& v1, const Vector& v2);
-constexpr Vector operator*(const Vector& v, const double k);
-constexpr Vector operator*(const double k, const Vector& v);
-constexpr Vector operator/(const Vector& v, const double k);
-constexpr Vector operator+(const Vector& v1, const Vector& v2);
-constexpr Vector operator-(const Vector& v);
-constexpr Vector operator-(const Vector& v1, const Vector& v2);
-constexpr Vector operator%(const Vector& v1, const Vector& v2);
+constexpr double operator*(const Vector& v1, const Vector& v2) noexcept;
+constexpr Vector operator*(const Vector& v, const double k) noexcept;
+constexpr Vector operator*(const double k, const Vector& v) noexcept;
+constexpr Vector operator/(const Vector& v, const double k) noexcept;
+constexpr Vector operator+(const Vector& v1, const Vector& v2) noexcept;
+constexpr Vector operator-(const Vector& v) noexcept;
+constexpr Vector operator-(const Vector& v1, const Vector& v2) noexcept;
+constexpr Vector operator%(const Vector& v1, const Vector& v2) noexcept;
 
-constexpr bool operator==(const Vector& v1, const Vector& v2);
-constexpr bool operator!=(const Vector& v1, const Vector& v2);
-constexpr bool operator<(const Vector& v1, const Vector& v2);
-constexpr bool operator<=(const Vector& v1, const Vector& v2);
-constexpr bool operator>(const Vector& v1, const Vector& v2);
-constexpr bool operator>=(const Vector& v1, const Vector& v2);
+constexpr bool operator==(const Vector& v1, const Vector& v2) noexcept;
+constexpr bool operator!=(const Vector& v1, const Vector& v2) noexcept;
+constexpr bool operator<(const Vector& v1, const Vector& v2) noexcept;
+constexpr bool operator<=(const Vector& v1, const Vector& v2) noexcept;
+constexpr bool operator>(const Vector& v1, const Vector& v2) noexcept;
+constexpr bool operator>=(const Vector& v1, const Vector& v2) noexcept;
 
-constexpr double magnitude(const Vector& v);
-constexpr Vector normalize(const Vector& v);
+constexpr double magnitude(const Vector& v) noexcept;
+constexpr Vector normalize(const Vector& v) noexcept;
 
 using MaybeVector = std::optional<Vector>;
 
-constexpr Vector::Vector(const double x, const double y, const double z): 
+constexpr Vector::Vector(const double x, const double y, const double z) noexcept: 
 	_x {x}, 
 	_y {y}, 
 	_z {z} {
 }
 
-constexpr double Vector::x() const {
+constexpr double Vector::x() const noexcept {
 	return _x;
 }
 
-constexpr double Vector::y() const {
+constexpr double Vector::y() const noexcept {
 	return _y;
 }
 
-constexpr double Vector::z() const {
+constexpr double Vector::z() const noexcept {
 	return _z;
 }
 
-inline void Vector::x(const double x) {
+inline void Vector::x(const double x) noexcept {
 	_x = x;
 }
 
-inline void Vector::y(const double y) {
+inline void Vector::y(const double y) noexcept {
 	_y = y;
 }
 
-inline void Vector::z(const double z) {
+inline void Vector::z(const double z) noexcept {
 	_z = z;
 }
 
-constexpr Vector& Vector::operator+=(const Vector& v) {
+constexpr Vector& Vector::operator+=(const Vector& v) noexcept {
 	_x += v.x();
 	_y += v.y();
 	_z += v.z();
@@ -85,11 +85,11 @@ constexpr Vector& Vector::operator+=(const Vector& v) {
 	return *this;
 }
 
-constexpr Vector& Vector::operator-=(const Vector& v) {
+constexpr Vector& Vector::operator-=(const Vector& v) noexcept {
 	return *this += -v;
 }
 
-constexpr Vector& Vector::operator*=(const double k) {
+constexpr Vector& Vector::operator*=(const double k) noexcept {
 	_x *= k;
 	_y *= k;
 	_z *= k;
@@ -97,7 +97,7 @@ constexpr Vector& Vector::operator*=(const double k) {
 	return *this;
 }
 
-constexpr Vector& Vector::operator/=(const double k) {
+constexpr Vector& Vector::operator/=(const double k) noexcept {
 	_x /= k;
 	_y /= k;
 	_z /= k;
@@ -105,37 +105,37 @@ constexpr Vector& Vector::operator/=(const double k) {
 	return *this;
 }
 
-constexpr double operator*(const Vector& v1, const Vector& v2) {
+constexpr double operator*(const Vector& v1, const Vector& v2) noexcept {
 	return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
 
-constexpr Vector operator*(const Vector& v, const double k) {
+constexpr Vector operator*(const Vector& v, const double k) noexcept {
 	return {k*v.x(), k*v.y(), k*v.z()};
 }
 
-constexpr Vector operator*(const double k, const Vector& v) {
+constexpr Vector operator*(const double k, const Vector& v) noexcept {
 	return v * k;
 }
 
-constexpr Vector operator/(const Vector& v, const double k) {
+constexpr Vector operator/(const Vector& v, const double k) noexcept {
 	return 1/k * v;
 }
 
-constexpr Vector operator+(const Vector& v1, const Vector& v2) {
+constexpr Vector operator+(const Vector& v1, const Vector& v2) noexcept {
 	return {v1.x() + v2.x(), v1.y() + v2.y(), v1.z() + v2.z()};
 }
 
-constexpr Vector operator-(const Vector& v) {
+constexpr Vector operator-(const Vector& v) noexcept {
 	return {-v.x(), -v.y(), -v.z()};
 }
 
-constexpr Vector operator-(const Vector& v1, const Vector& v2) {
+constexpr Vector operator-(const Vector& v1, const Vector& v2) noexcept {
 	return v1 + -v2;
 }
 
 
 // Cross Product, since % kind of looks like and x
-constexpr Vector operator%(const Vector& v1, const Vector& v2) {
+constexpr Vector operator%(const Vector& v1, const Vector& v2) noexcept {
 	const double s1 {v1.y()*v2.z() - v1.z()*v2.y()};
 	const double s2 {v1.z()*v2.x() - v1.x()*v2.z()};
 	const double s3 {v1.x()*v2.y() - v1.y()*v2.x()};
@@ -143,7 +143,7 @@ constexpr Vector operator%(const Vector& v1, const Vector& v2) {
 	return {s1, s2, s3};
 }
 
-constexpr bool operator==(const Vector& v1, const Vector& v2) {
+constexpr bool operator==(const Vector& v1, const Vector& v2) noexcept {
 	const double ESP {1e-9};
 	const Vector v {v1 - v2};
 
@@ -152,11 +152,11 @@ constexpr bool operator==(const Vector& v1, const Vector& v2) {
 //	return v1.x() == v2.x() && v1.y() == v2.y() && v1.z() == v2.z();
 }
 
-constexpr bool operator!=(const Vector& v1, const Vector& v2) {
+constexpr bool operator!=(const Vector& v1, const Vector& v2) noexcept {
 	return !(v1 == v2);
 }
 
-constexpr bool operator<(const Vector& v1, const Vector& v2) {
+constexpr bool operator<(const Vector& v1, const Vector& v2) noexcept {
 	// TODO: use a global ESP
 	const double ESP {1e-9};
 	const Vector v {v1 - v2};
@@ -165,31 +165,27 @@ constexpr bool operator<(const Vector& v1, const Vector& v2) {
 	for (const auto& d: diffs)
 		if (fabs(d) >= ESP)
 			return d < 0;
-
-//	return v1.x() < v2.x()
-//		|| (v1.x() == v2.x() && v1.y() < v2.y())
-//		|| (v1.x() == v2.x() && v1.y() == v2.y() && v1.z() < v2.z());
 }
 
-constexpr bool operator<=(const Vector& v1, const Vector& v2) {
+constexpr bool operator<=(const Vector& v1, const Vector& v2) noexcept {
 	return v1 < v2 || v1 == v2;
 }
 
-constexpr bool operator>(const Vector& v1, const Vector& v2) {
+constexpr bool operator>(const Vector& v1, const Vector& v2) noexcept {
 	return !(v1 <= v2);
 
 }
 
-constexpr bool operator>=(const Vector& v1, const Vector& v2) {
+constexpr bool operator>=(const Vector& v1, const Vector& v2) noexcept {
 	return v1 > v2 || v1 == v2;
 
 }
 
-constexpr double magnitude(const Vector& v)  {
+constexpr double magnitude(const Vector& v)  noexcept {
 	return std::sqrt(v * v);
 }
 
-constexpr Vector normalize(const Vector& v) {
+constexpr Vector normalize(const Vector& v) noexcept {
 	return v / magnitude(v);
 }
 #endif

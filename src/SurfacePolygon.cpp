@@ -10,9 +10,9 @@ MaybeVector SurfacePolygon::intersection(const Line& ray) const {
 
 	const Intersection inter {intersection(_poly, ray)};
 	if (const auto solp = std::get_if<Vector>(&inter))
-		return {true, *solp};
+		return *solp;
 	else
-		return {false, {0, 0, 0}};
+		return {};
 }
 
 Vector SurfacePolygon::normal(const Vector& point, const Vector& light) const {

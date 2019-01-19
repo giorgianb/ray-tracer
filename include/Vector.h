@@ -1,7 +1,7 @@
 #ifndef __RAY_TRACER_VECTOR_INCLUDED
 #define __RAY_TRACER_VECTOR_INCLUDED
 
-#include <utility>
+#include <optional>
 
 class Vector {
 	private:
@@ -44,5 +44,5 @@ bool operator>=(const Vector& v1, const Vector& v2);
 double magnitude(const Vector& v);
 Vector normalize(const Vector& v);
 
-using MaybeVector = std::pair<bool, Vector>;
+using MaybeVector = std::optional<Vector>;
 #endif

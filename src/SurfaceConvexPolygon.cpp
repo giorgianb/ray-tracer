@@ -11,9 +11,9 @@ MaybeVector SurfaceConvexPolygon::intersection(const Line& ray) const {
 
 	const Intersection s {intersection(_poly, ray)};
 	if (const auto solp = std::get_if<Vector>(&s))
-		return {true, *solp};
+		return *solp;
 	else
-		return {false, {0, 0, 0}};
+		return {};
 }
 
 Vector SurfaceConvexPolygon::normal(const Vector& point, const Vector& light) const {

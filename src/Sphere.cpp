@@ -31,11 +31,11 @@ MaybeVector Sphere::intersection(const Line& ray) const {
 	const double d {b*b - 4*a*c};
 	// Solution doesn't exist
 	if (d < 0) 
-		return MaybeVector {false, {0, 0, 0}};
+		return {};
 
 	// Otherwise, use minimum root
 	const double s {(-b - std::sqrt(d))/(2*a)};
-	return {true, evaluate(ray, s)};
+	return evaluate(ray, s);
 }
 
 Vector Sphere::normal(const Vector& point, const Vector& light) const {

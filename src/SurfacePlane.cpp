@@ -15,9 +15,9 @@ MaybeVector SurfacePlane::intersection(const Line& ray) const {
 
 	const Intersection s {intersection(_plane, ray)};
 	if (const auto vp = std::get_if<Vector>(&s))
-		return {true, *vp};
+		return *vp;
 	else
-		return {false, {0, 0, 0}};
+		return {};
 }
 
 Vector SurfacePlane::normal(const Vector& point, const Vector& light) const {

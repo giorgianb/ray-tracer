@@ -6,9 +6,9 @@ MaybeVector evaluate(const LineSegment& ls, const double& s) {
 	const Vector v {evaluate(ls.line(), s)};
 
 	if (v >= ls.begin() && v <= ls.end())
-		return {true, v};
+		return v;
 
-	return {false, {0, 0, 0}};
+	return {};
 }
 
 Vector normal(const LineSegment& ls, const Vector& v) {

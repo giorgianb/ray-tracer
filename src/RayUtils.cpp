@@ -3,10 +3,9 @@
 
 MaybeVector evaluate(const Ray& r, const double& s) {
 	if (s >= 0)
-		return {true, evaluate(Line {r.direction(), r.offset()}, s)};
+		return evaluate(Line {r.direction(), r.offset()}, s);
 
-	return {false, {0, 0, 0}};
-
+	return {};
 }
 
 Vector normal(const Ray& r, const Vector& v) {

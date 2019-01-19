@@ -38,33 +38,38 @@ PPMImage trace(const SurfaceList& world,
 
 			// Find closest hit
 			double distance {std::numeric_limits<double>::infinity()};
-			Surface* hit {nullptr};
+			Surface* s {nullptr};
+			MaybeVector hit {};
 			for (const auto& surface: world) {
-				MaybeVector phit {surface->intersection(ray)};
+				const MaybeVector phit {surface->intersection(ray)};
 				// also assures us that it is in front of the eye
-				if (phit.first && magnitude(phit.second - eye) < distance
-						&& (phit.second - eye) * to_plane > 0) {
-					hit = surface;
-					distance = magnitude(phit.second - eye);
+				if (phit && magnitude(*phit - eye) < distance
+						&& (*phit - eye) * to_plane > 0) {
+					s = surface;
+					hit = *phit;
+					distance = magnitude(*phit - eye);
 				}
 			}
 
 			// We have a hit, find its color
 			if (hit) {
-				const Vector h {hit->intersection(ray).second};
-				const Color sc {hit->color(h)};
+				const Color sc {s->color(*hit)};
 				const Vector dir {ray.direction()};
-				double ri {std::abs(normalize(dir)*hit->normal(h, eye)) * sc.r};
-				double bi {std::abs(normalize(dir)*hit->normal(h, eye)) * sc.b};
-				double gi {std::abs(normalize(dir)*hit->normal(h, eye)) * sc.g};
-				ri /= (magnitude(h - eye) * magnitude(h - eye));
+				double ri {std::abs(normalize(dir)*s->normal(*hit, eye)) * sc.r};
+				double bi {std::abs(normalize(dir)*s->normal(*hit, eye)) * sc.b};
+				double gi {std::abs(normalize(dir)*s->normal(*hit, eye)) * sc.g};
+				ri /= (magnitude(*hit - eye) * magnitude(*hit - eye));
 				ri = std::min(255.0, std::round(ri * brightness * 255));
-				bi /= (magnitude(h - eye) * magnitude(h - eye));
+				bi /= (magnitude(*hit - eye) * magnitude(*hit - eye));
 				bi = std::min(255.0, std::round(bi * brightness * 255));
-				gi /= (magnitude(h - eye) * magnitude(h - eye));
+				gi /= (magnitude(*hit - eye) * magnitude(*hit - eye));
 				gi = std::min(255.0, std::round(gi * brightness * 255));
 
-				traced[i][j] = {ri, bi, gi};
+				traced[i][j] = {
+					static_cast<unsigned char>(ri),
+					static_cast<unsigned char>(bi),
+					static_cast<unsigned char>(gi)
+				};
 			}
 		}
 	}

@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <cassert>
+#include <cmath>
 
 Vector evaluate(const Plane& p, const double& s, const double& t) {
 	return s*p.u() + t*p.v() + p.offset();
@@ -15,52 +16,31 @@ Vector normal(const Plane& p) {
 
 
 Intersection intersection(const Plane& p, const Vector& tp) {
-	AugmentedMatrix am {
-		{
-			{p.u().x(), p.v().x()},
-				{p.u().y(), p.v().y()},
-				{p.u().z(), p.v().z()}
-		},
-			{
-				{tp.x() - p.offset().x()},
-				{tp.y() - p.offset().y()},
-				{tp.z() - p.offset().z()}
-			}
-	};
-
-	const SolutionSet s {solution(rref_in_place(am))};
-	switch (s.first) {
-		case SolutionSetType::none:
-			return EmptySet {};
-		case SolutionSetType::unique:
-			return tp;
-		case SolutionSetType::infinite:
-			assert(false);
-			return EmptySet {};
-	}
+	const Vector dv {tp - p.offset()};
+	// See if (offset -> point) and plane's normal are perpendicular
+	
+	return (std::fabs(dv * normal(p)) <= ESP) ? Intersection {tp} : Intersection {EmptySet {}};
 }
 
 Intersection intersection(const Plane& p, const Line& l) {
-	AugmentedMatrix am {
-		{
-			{l.direction().x(), -p.u().x(), -p.v().x()},
-				{l.direction().y(), -p.u().y(), -p.v().y()},
-				{l.direction().z(), -p.u().z(), -p.v().z()},
-		},
-			{
-				{p.offset().x() - l.offset().x()},
-				{p.offset().y() - l.offset().y()},
-				{p.offset().z() - l.offset().z()}
-			}
-	};
+	// Test if line is in the plane
+	// See if plane's normal and line's direction are perpendicular, than see
+	// whether the line's offset is in the plane. If it is, than the line and the plane
+	// fully intersect. Otherwise, they are parallel
+	
+	// outline:
+	// l = s(a_x, a_y, a_z) + (o_x, o_y, o_z)
+	// (A, B, C) = normal(p)
+	// d = normal(p) * p.offset()
+	// Ax + By + Cz = d 
+	// A*(s*a_x + o_x) + B*(s*a_y + o_y) + C*(s*a_z + o_z) = d 
+	// => s*((A, B, C) * (a_x, a_y, a_z)) = d - (A, B, C) * (o_x, o_y, o_z)
+	const Vector n {normal(p)};
+	const double d {n*p.offset()};
+	const double constant {d - n*l.offset()};
+	const double coeff {n * l.direction()};
+	if (std::fabs(coeff) <= ESP)
+		return (std::fabs(constant) <= 0) ? Intersection {l} : Intersection {EmptySet {}};
 
-	const SolutionSet s {solution(rref_in_place(am))};
-	switch (s.first) {
-		case SolutionSetType::none:
-			return EmptySet {};
-		case SolutionSetType::unique:
-			return evaluate(l, s.second[0][0]);
-		case SolutionSetType::infinite:
-			return l;
-	}
+	return evaluate(l, constant / coeff);
 }

@@ -9,3 +9,7 @@ Make header file formatting more consistent
 Make (const Line& ray) a (const Ray& ray) in Surface*
 Make more class member const or constexpr
 Make read_surfaces throw an exception on syntax error
+Specify somewhere that for the Polygon, the vertices are expected in the following format:
+	- Counterclockwise
+	- first vertex == last vertex
+Use multiple threads for trace

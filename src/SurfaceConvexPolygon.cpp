@@ -1,4 +1,6 @@
 #include "SurfaceConvexPolygon.h"
+#include "ConvexPolygonUtils.h"
+#include "PlaneUtils.h"
 
 SurfaceConvexPolygon::SurfaceConvexPolygon(const ConvexPolygon p, const Color c): 
 	_poly {p}, _color {c} {
@@ -7,9 +9,9 @@ SurfaceConvexPolygon::SurfaceConvexPolygon(const ConvexPolygon p, const Color c)
 MaybeVector SurfaceConvexPolygon::intersection(const Line& ray) const {
 	using ::intersection;
 
-	const LineConvexPolygonIntersection s {intersection(_poly, ray)};
-	if (s.first == LineConvexPolygonIntersectionType::point)
-		return {true, s.second};
+	const Intersection s {intersection(_poly, ray)};
+	if (const auto solp = std::get_if<Vector>(&s))
+		return {true, *solp};
 	else
 		return {false, {0, 0, 0}};
 }

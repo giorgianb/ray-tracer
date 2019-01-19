@@ -19,7 +19,7 @@ Vector SurfacePolygon::normal(const Vector& point, const Vector& light) const {
 	using ::normal;
 
 	const Vector v {light - point};
-	const Vector n {normal(_poly.plane())};
+	const Vector n {normal(_poly)};
 
 	return n*v > 0 ? n : -n;
 }

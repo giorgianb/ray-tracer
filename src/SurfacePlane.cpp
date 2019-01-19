@@ -1,5 +1,5 @@
 #include "SurfacePlane.h"
-#include "Linear.h"
+#include "PlaneUtils.h"
 
 #include <cassert>
 
@@ -13,9 +13,9 @@ Plane SurfacePlane::plane() const {
 MaybeVector SurfacePlane::intersection(const Line& ray) const {
 	using ::intersection;
 
-	const LinePlaneIntersection s {intersection(_plane, ray)};
-	if (s.first == LinePlaneIntersectionType::point)
-		return {true, s.second};
+	const Intersection s {intersection(_plane, ray)};
+	if (const auto vp = std::get_if<Vector>(&s))
+		return {true, *vp};
 	else
 		return {false, {0, 0, 0}};
 }

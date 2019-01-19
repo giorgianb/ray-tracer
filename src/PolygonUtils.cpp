@@ -1,13 +1,14 @@
 #include "PolygonUtils.h"
 #include "LineSegmentUtils.h"
+#include "PlaneUtils.h"
 
 Vector normal(const Polygon& p) {
 	return normal(p.plane());
 }
 
 Intersection intersection(const Polygon& p, const Vector& tp) {
-	auto [type, sol] = intersection(p.plane(), tp);
-	if (type != PointPlaneIntersectionType::point)
+	const Intersection inter {intersection(p.plane(), tp)};
+	if (!std::holds_alternative<Vector>(inter))
 		return EmptySet {}; // tp not in polygon's plane
 
 	size_t count {0};
@@ -24,13 +25,11 @@ Intersection intersection(const Polygon& p, const Vector& tp) {
 }
 
 Intersection intersection(const Polygon& p, const Line& l) {
-	auto [type, sol] = intersection(p.plane(), l);
-	switch (type) {
-		case LinePlaneIntersectionType::line:
-			return l;
-		case LinePlaneIntersectionType::point:
-			return intersection(p, sol);
-		default:
-			return EmptySet {};
-	}
+	const Intersection inter{intersection(p.plane(), l)};
+	if (std::holds_alternative<Line>(inter))
+		return l;
+	else if (const auto solp = std::get_if<Vector>(&inter))
+		return intersection(p, *solp);
+	else
+		return EmptySet {};
 }

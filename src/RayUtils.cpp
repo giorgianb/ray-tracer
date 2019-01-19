@@ -1,4 +1,6 @@
 #include "RayUtils.h"
+#include "LineUtils.h"
+
 MaybeVector evaluate(const Ray& r, const double& s) {
 	if (s >= 0)
 		return {true, evaluate(Line {r.direction(), r.offset()}, s)};
@@ -12,29 +14,23 @@ Vector normal(const Ray& r, const Vector& v) {
 }
 
 Intersection intersection(const Ray& r, const Line& l) {
-	auto [type, sol] = intersection(Line {r.direction(), r.offset()}, l);
+	const Intersection inter {intersection(Line {r.direction(), r.offset()}, l)};
 
-	switch (type) {
-		case LineLineIntersectionType::none:
-			return EmptySet {};
-		case LineLineIntersectionType::point:
-			return ((sol - r.offset()) * r.direction()) >= 0 ?
-				Intersection {sol} : Intersection {EmptySet {}};
-		case LineLineIntersectionType::line:
-			return r;
-	}
-
+	if (const auto solp = std::get_if<Vector>(&inter))
+		return ((*solp - r.offset()) * r.direction()) >= 0 ?
+			Intersection {*solp} : Intersection {EmptySet {}};
+	else if (std::holds_alternative<Line>(inter))
+		return r;
+	else
+		return EmptySet {};
 }
 
 Intersection intersection(const Ray& r, const Vector& v) {
-	auto [type, sol] = intersection(Line {r.direction(), r.offset()}, v);
+	const Intersection inter {intersection(Line {r.direction(), r.offset()}, v)};
 
-	switch (type) {
-		case LineVectorIntersectionType::none:
-			return EmptySet {};
-		case LineVectorIntersectionType::point:
-			return ((sol - r.offset()) * r.direction()) >= 0 ?
-				Intersection {sol} : Intersection {EmptySet {}};
-
-	}
+	if (const auto solp = std::get_if<Vector>(&inter))
+		return ((*solp - r.offset()) * r.direction()) >= 0 ?
+			Intersection {*solp} : Intersection {EmptySet {}};
+	else
+		return EmptySet {};
 }

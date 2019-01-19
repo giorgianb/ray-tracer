@@ -3,11 +3,6 @@
 
 #include "Vector.h"
 
-enum class LineLineIntersectionType {none, point, line};
-enum class LineVectorIntersectionType {none, point};
-using LineLineIntersection = std::pair<LineLineIntersectionType, Vector>;
-using LineVectorIntersection = std::pair<LineVectorIntersectionType, Vector>;
-
 class Line {
 	private:
 		Vector _direction;
@@ -17,9 +12,4 @@ class Line {
 		Vector direction() const;
 		Vector offset() const;
 };
-
-Vector evaluate(const Line& l, const double& s);
-Vector normal(const Line& l, const Vector& v);
-LineLineIntersection intersection(const Line& l1, const Line& l2);
-LineVectorIntersection intersection(const Line& l, const Vector& v);
 #endif

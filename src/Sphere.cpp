@@ -1,4 +1,5 @@
 #include "Sphere.h"
+#include "LineUtils.h"
 #include <cassert>
 #include <cmath>
 

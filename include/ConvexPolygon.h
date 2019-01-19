@@ -5,9 +5,6 @@
 #include "Line.h"
 #include <vector>
 
-enum class LineConvexPolygonIntersectionType {none, point, line};
-using LineConvexPolygonIntersection = std::pair<LineConvexPolygonIntersectionType, Vector>;
-
 using LineSet = std::vector<Line>;
 
 class ConvexPolygon {
@@ -19,8 +16,4 @@ class ConvexPolygon {
 		Plane plane() const;
 		LineSet edges() const;
 };
-
-Vector normal(const ConvexPolygon& p);
-bool contains(const ConvexPolygon& p, const Vector& tp);
-LineConvexPolygonIntersection intersection(const ConvexPolygon& p, const Line& l);
 #endif

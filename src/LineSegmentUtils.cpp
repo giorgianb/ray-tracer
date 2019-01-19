@@ -1,4 +1,5 @@
 #include "LineSegmentUtils.h"
+#include "LineUtils.h"
 #include "RayUtils.h"
 
 MaybeVector evaluate(const LineSegment& ls, const double& s) {
@@ -15,38 +16,34 @@ Vector normal(const LineSegment& ls, const Vector& v) {
 }
 
 Intersection intersection(const LineSegment& ls, const Line& l) {
-	auto [type, sol] = intersection(ls.line(), l);
+	const Intersection inter {intersection(ls.line(), l)};
 
-	switch (type) {
-		case LineLineIntersectionType::none:
-			return EmptySet {};
-		case LineLineIntersectionType::point:
-			return (sol >= ls.begin() && sol <= ls.end()) ? 
-				Intersection {sol} : Intersection {EmptySet {}};
-		case LineLineIntersectionType::line:
-			return ls;
-	}
+	if (const auto solp = std::get_if<Vector>(&inter))
+		return (*solp >= ls.begin() && *solp <= ls.end()) ? 
+			Intersection {*solp} : Intersection {EmptySet {}};
+	else if (std::holds_alternative<Line>(inter))
+		return ls;
+	else
+		return EmptySet {};
 }
 
 Intersection intersection(const LineSegment& ls, const Vector& v) {
-	auto [type, sol] = intersection(ls.line(), v);
+	const Intersection inter {intersection(ls.line(), v)};
 
-	switch (type) {
-		case LineVectorIntersectionType::none:
-			return EmptySet {};
-		case LineVectorIntersectionType::point:
-			return (sol >= ls.begin() && sol <= ls.end()) ? 
-				Intersection {sol} : Intersection {EmptySet {}};
-	}
+	if (const auto solp = std::get_if<Vector>(&inter))
+		return (*solp >= ls.begin() && *solp <= ls.end()) ? 
+			Intersection {*solp} : Intersection {EmptySet {}};
+	else
+		return EmptySet {};
 }
 
 Intersection intersection(const LineSegment& ls, const Ray& r) {
 	const Intersection inter {intersection(r, ls.line())};
 
-	if (auto sol = std::get_if<Vector>(&inter))
+	if (const auto sol = std::get_if<Vector>(&inter))
 		return (*sol >= ls.begin() && *sol <= ls.end()) ?
 			Intersection {*sol} : Intersection {EmptySet {}};
-	else if (auto sol = std::get_if<Ray>(&inter)) {
+	else if (const auto sol = std::get_if<Ray>(&inter)) {
 		const Ray rsol {*sol};
 		Intersection ret;
 

@@ -1,4 +1,3 @@
-Get rid of as much rref usage as possible (it creates too many temporary matrices which are expensive to create)
 Make rref a constexpr
 Make constructors constexpr
 Make as much as possible constexpr (which should be pretty much everything)

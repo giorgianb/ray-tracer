@@ -5,11 +5,24 @@
 
 class Line {
 	private:
-		Vector _direction;
-		Vector _offset;
+		const Vector _direction;
+		const Vector _offset;
 	public:
-		Line(const Vector& direction, const Vector& offset);
-		Vector direction() const;
-		Vector offset() const;
+		constexpr Line(const Vector& direction, const Vector& offset) noexcept;
+		constexpr Vector direction() const noexcept;
+		constexpr Vector offset() const noexcept;
 };
+
+constexpr Line::Line(const Vector& direction, const Vector& offset) noexcept:
+	_direction {direction},
+	_offset {offset} {
+}
+
+constexpr Vector Line::direction() const noexcept {
+	return _direction;
+}
+
+constexpr Vector Line::offset() const noexcept {
+	return _offset;
+}
 #endif

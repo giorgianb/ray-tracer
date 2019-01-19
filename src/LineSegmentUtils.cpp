@@ -37,6 +37,10 @@ Intersection intersection(const LineSegment& ls, const Vector& v) {
 		return EmptySet {};
 }
 
+Intersection check_empty(const LineSegment& ls) {
+	return (ls.begin() == ls.end()) ? Intersection {ls.begin()} : Intersection {ls};
+}
+
 Intersection intersection(const LineSegment& ls, const Ray& r) {
 	const Intersection inter {intersection(r, ls.line())};
 
@@ -45,32 +49,25 @@ Intersection intersection(const LineSegment& ls, const Ray& r) {
 			Intersection {*sol} : Intersection {EmptySet {}};
 	else if (const auto sol = std::get_if<Ray>(&inter)) {
 		const Ray rsol {*sol};
-		Intersection ret;
 
 		if (rsol.offset() <= ls.begin()) {
 			if ((ls.begin() - rsol.offset()) * rsol.direction() >= 0)
-				ret = ls;
+				return check_empty(ls);
 			else
-				ret = EmptySet {};
+				return EmptySet {};
 		} else if (rsol.offset() >= ls.end()) {
 			if ((ls.end() - rsol.offset()) * rsol.direction() >= 0)
-				ret = ls;
+				return check_empty(ls);
 			else
-				ret = EmptySet {};
+				return EmptySet {};
 		// Offset->begin same direction as rsol.direction()
 		} else if ((ls.begin() - rsol.offset()) * rsol.direction() >= 0)
-			ret =  LineSegment {ls.begin(), rsol.offset()};
+			return check_empty({ls.begin(), rsol.offset()});
 		// Offset->end same direction as rsol.direction()
 		else if ((ls.end() - rsol.offset()) * rsol.direction() >= 0)
-			ret = LineSegment {rsol.offset(), ls.end()};
-
-		if (std::holds_alternative<LineSegment>(ret)) {
-			const auto s = std::get<LineSegment>(ret);
-			if (s.begin() == s.end())
-				ret = s.begin();
-		}
-
-		return ret;
+			return check_empty({rsol.offset(), ls.end()});
+		else 
+			return EmptySet {};
 	} else
 		return EmptySet {};
 }

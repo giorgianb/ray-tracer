@@ -10,9 +10,27 @@ class Plane {
 		const Vector _u;
 		const Vector _offset;
 	public:
-		Plane(const Vector& v, const Vector& u, const Vector& offset);
-		Vector u() const;
-		Vector v() const;
-		Vector offset() const;
+		constexpr Plane(const Vector& v, const Vector& u, const Vector& offset) noexcept;
+		constexpr Vector u() const noexcept;
+		constexpr Vector v() const noexcept;
+		constexpr Vector offset() const noexcept;
 };
+
+constexpr Plane::Plane(const Vector& u, const Vector& v, const Vector& offset) noexcept:
+	_u {u},
+	_v {v},
+	_offset {offset} {
+}
+
+constexpr Vector Plane::u() const noexcept {
+	return _u;
+}
+
+constexpr Vector Plane::v() const noexcept {
+	return _v;
+}
+
+constexpr Vector Plane::offset() const noexcept {
+	return _offset;
+}
 #endif

@@ -25,7 +25,7 @@ Intersection intersection(const Polygon& p, const Vector& tp) {
 }
 
 Intersection intersection(const Polygon& p, const Line& l) {
-	const Intersection inter{intersection(p.plane(), l)};
+	const Intersection inter {intersection(p.plane(), l)};
 	if (std::holds_alternative<Line>(inter))
 		return l;
 	else if (const auto solp = std::get_if<Vector>(&inter))
@@ -33,3 +33,16 @@ Intersection intersection(const Polygon& p, const Line& l) {
 	else
 		return EmptySet {};
 }
+
+
+Intersection intersection(const Polygon& p, const Ray& r) {
+	const Intersection inter {intersection(p.plane(), r)};
+
+	if (std::holds_alternative<Ray>(inter))
+		return r;
+	else if (const auto solp = std::get_if<Vector>(&inter))
+		return intersection(p, *solp);
+	else
+		return EmptySet {};
+}
+

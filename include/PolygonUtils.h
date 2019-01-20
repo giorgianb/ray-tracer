@@ -6,4 +6,5 @@
 Vector normal(const Polygon& p);
 Intersection intersection(const Polygon& p, const Vector& tp);
 Intersection intersection(const Polygon& p, const Line& l);
+Intersection intersection(const Polygon& p, const Ray& r);
 #endif

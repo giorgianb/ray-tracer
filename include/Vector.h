@@ -165,6 +165,8 @@ constexpr bool operator<(const Vector& v1, const Vector& v2) noexcept {
 	for (const auto& d: diffs)
 		if (fabs(d) >= ESP)
 			return d < 0;
+
+	return false;
 }
 
 constexpr bool operator<=(const Vector& v1, const Vector& v2) noexcept {

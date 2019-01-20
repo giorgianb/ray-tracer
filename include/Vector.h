@@ -16,9 +16,9 @@ class Vector {
 		constexpr double y() const noexcept;
 		constexpr double z() const noexcept;
 
-		inline void x(const double x) noexcept;
-		inline void y(const double y) noexcept;
-		inline void z(const double z) noexcept;
+		constexpr void x(const double x) noexcept;
+		constexpr void y(const double y) noexcept;
+		constexpr void z(const double z) noexcept;
 
 		constexpr Vector& operator+=(const Vector& v) noexcept;
 		constexpr Vector& operator-=(const Vector& v) noexcept;
@@ -65,15 +65,15 @@ constexpr double Vector::z() const noexcept {
 	return _z;
 }
 
-inline void Vector::x(const double x) noexcept {
+constexpr void Vector::x(const double x) noexcept {
 	_x = x;
 }
 
-inline void Vector::y(const double y) noexcept {
+constexpr void Vector::y(const double y) noexcept {
 	_y = y;
 }
 
-inline void Vector::z(const double z) noexcept {
+constexpr void Vector::z(const double z) noexcept {
 	_z = z;
 }
 

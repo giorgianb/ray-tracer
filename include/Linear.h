@@ -17,6 +17,4 @@ AugmentedMatrix& rref_in_place(AugmentedMatrix& am);
 AugmentedMatrix rref(AugmentedMatrix am);
 SolutionSetType number_solutions(const AugmentedMatrix& m);
 SolutionSet solution(const AugmentedMatrix& m);
-
-constexpr double ESP {1e-9};
 #endif

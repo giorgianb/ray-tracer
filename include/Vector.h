@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <cmath>
+#include "Float.h"
 
 class Vector {
 	private:
@@ -144,12 +145,11 @@ constexpr Vector operator%(const Vector& v1, const Vector& v2) noexcept {
 }
 
 constexpr bool operator==(const Vector& v1, const Vector& v2) noexcept {
-	const double ESP {1e-9};
 	const Vector v {v1 - v2};
 
-	return fabs(v.x()) <= ESP && fabs(v.y()) <= ESP && fabs(v.z()) <= ESP;
-
-//	return v1.x() == v2.x() && v1.y() == v2.y() && v1.z() == v2.z();
+	return fabs(v.x()) <= Float::epsilon 
+		&& fabs(v.y()) <= Float::epsilon 
+		&& fabs(v.z()) <= Float::epsilon;
 }
 
 constexpr bool operator!=(const Vector& v1, const Vector& v2) noexcept {
@@ -157,13 +157,11 @@ constexpr bool operator!=(const Vector& v1, const Vector& v2) noexcept {
 }
 
 constexpr bool operator<(const Vector& v1, const Vector& v2) noexcept {
-	// TODO: use a global ESP
-	const double ESP {1e-9};
 	const Vector v {v1 - v2};
 
 	const double diffs[3] {v.x(), v.y(), v.z()};
 	for (const auto& d: diffs)
-		if (fabs(d) >= ESP)
+		if (fabs(d) >= Float::epsilon)
 			return d < 0;
 
 	return false;

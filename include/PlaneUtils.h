@@ -6,10 +6,12 @@
 #include "Linear.h"
 #include "Ray.h"
 #include "RayUtils.h"
+#include "Float.h"
+
 #include <utility>
+#include <cmath>
 
 #include <cassert>
-#include <cmath>
 
 constexpr Vector evaluate(const Plane& p, const double& s, const double& t) noexcept;
 constexpr Vector normal(const Plane& p) noexcept;
@@ -30,7 +32,8 @@ constexpr Intersection intersection(const Plane& p, const Vector& tp) noexcept {
 	const Vector dv {tp - p.offset()};
 	// See if (offset -> point) and plane's normal are perpendicular
 	
-	return (std::fabs(dv * normal(p)) <= ESP) ? Intersection {tp} : Intersection {EmptySet {}};
+	return (std::fabs(dv * normal(p)) <= Float::epsilon) 
+		? Intersection {tp} : Intersection {EmptySet {}};
 }
 
 constexpr Intersection intersection(const Plane& p, const Line& l) noexcept {
@@ -50,7 +53,7 @@ constexpr Intersection intersection(const Plane& p, const Line& l) noexcept {
 	const double d {n*p.offset()};
 	const double constant {d - n*l.offset()};
 	const double coeff {n * l.direction()};
-	if (std::fabs(coeff) <= ESP)
+	if (std::fabs(coeff) <= Float::epsilon)
 		return (std::fabs(constant) <= 0) ? Intersection {l} : Intersection {EmptySet {}};
 
 	return evaluate(l, constant / coeff);
@@ -61,7 +64,7 @@ constexpr Intersection intersection(const Plane& p, const Ray& r) noexcept {
 	const double d {n*p.offset()};
 	const double constant {d - n*r.offset()};
 	const double coeff {n * r.direction()};
-	if (std::fabs(coeff) <= ESP)
+	if (std::fabs(coeff) <= Float::epsilon)
 		return (std::fabs(constant) <= 0) ? Intersection {r} : Intersection {EmptySet {}};
 
 	const double s {constant / coeff};

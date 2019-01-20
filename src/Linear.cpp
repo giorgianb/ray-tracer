@@ -1,8 +1,10 @@
 #include "Linear.h"
+#include "Float.h"
 #include <cmath>
-#include <cassert>
 #include <algorithm>
 #include <utility>
+
+#include <cassert>
 
 Matrix create_matrix(const size_t n, const size_t m) {
 	Matrix a;
@@ -16,7 +18,7 @@ Matrix create_matrix(const size_t n, const size_t m) {
 // counts number of leading zeroes in a row
 size_t leading_zeroes(const Row& row) {
 	for (size_t i {0}; i < row.size(); ++i)
-		if (fabs(row[i]) > ESP)
+		if (fabs(row[i]) > Float::epsilon)
 			return i;
 
 	return row.size();
@@ -140,14 +142,14 @@ SolutionSetType number_solutions(const AugmentedMatrix& am) {
 		const bool zero_row {leading_zeroes(m[i]) == m[i].size()};
 		// check if augmented matrix contains a non-zero
 		for (size_t j {0}; zero_row && j < a[i].size(); ++j)
-			if (std::fabs(a[i][j]) > ESP) 
+			if (std::fabs(a[i][j]) > Float::epsilon) 
 				return SolutionSetType::none;
 	}
 
 	// check if we have row with a non-zero value outside of the diagonal
 	for (size_t i {0}; i < m.size(); ++i) {
 		for (size_t j {0}; j < m[i].size(); ++j)
-			if (i != j && fabs(m[i][j]) > ESP)
+			if (i != j && fabs(m[i][j]) > Float::epsilon)
 				return SolutionSetType::infinite;
 	}
 

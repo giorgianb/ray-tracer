@@ -2,6 +2,7 @@
 #include "LineUtils.h"
 #include "PlaneUtils.h"
 #include "Linear.h"
+#include "Float.h"
 #include <algorithm>
 #include <cmath>
 
@@ -46,7 +47,7 @@ bool contains(const ConvexPolygon& p, const Vector& tp) {
 
 		const SolutionSet s {solution(rref_in_place(am))};
 		assert(s.first == SolutionSetType::unique);
-		assert(std::fabs(s.second[2][0]) <= ESP);
+		assert(std::fabs(s.second[2][0]) <= Float::epsilon);
 		plane_points.push_back({s.second[0][0], s.second[1][0], 0});
 	}
 

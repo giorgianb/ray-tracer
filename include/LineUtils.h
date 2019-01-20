@@ -3,6 +3,7 @@
 #include "Line.h"
 #include "Intersection.h"
 #include "Linear.h"
+#include "Float.h"
 
 #include <cmath>
 
@@ -44,7 +45,7 @@ constexpr Intersection intersection(const Line& l1, const Line& l2) noexcept {
 	const double hm {magnitude(h)};
 	const double km {magnitude(k)};
 
-	if (std::fabs(hm) <= ESP || std::fabs(km) <= ESP)
+	if (std::fabs(hm) <= Float::epsilon || std::fabs(km) <= Float::epsilon)
 		return EmptySet {};
 	
 	const int s {(h*k) >= 0 ? 1 : -1};

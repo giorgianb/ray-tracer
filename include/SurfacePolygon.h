@@ -10,7 +10,7 @@ class SurfacePolygon: public Surface {
 		const Polygon _poly;
 		const Color _color;
 	public:
-		MaybeVector intersection(const Line& ray) const;
+		MaybeVector intersection(const Ray& ray) const;
 		Vector normal(const Vector& point, const Vector& light) const;
 		Color color(const Vector& point) const;
 

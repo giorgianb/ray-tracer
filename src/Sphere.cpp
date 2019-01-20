@@ -1,5 +1,5 @@
 #include "Sphere.h"
-#include "LineUtils.h"
+#include "RayUtils.h"
 #include <cassert>
 #include <cmath>
 
@@ -15,7 +15,7 @@ double Sphere::radius() const {
 	return _radius;
 }
 
-MaybeVector Sphere::intersection(const Line& ray) const {
+MaybeVector Sphere::intersection(const Ray& ray) const {
 	const double dx {ray.direction().x()};
 	const double dy {ray.direction().y()};
 	const double dz {ray.direction().z()};
@@ -35,6 +35,7 @@ MaybeVector Sphere::intersection(const Line& ray) const {
 
 	// Otherwise, use minimum root
 	const double s {(-b - std::sqrt(d))/(2*a)};
+
 	return evaluate(ray, s);
 }
 

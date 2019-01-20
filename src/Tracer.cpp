@@ -34,7 +34,7 @@ PPMImage trace(const SurfaceList& world,
 
 			// Ray from our eye to our current (x, y)
 			const Vector to_plane {Vector {x, y, plane_offset + eye.z()} - eye};
-			const Line ray {to_plane, eye};
+			const Ray ray {to_plane, eye};
 
 			// Find closest hit
 			double distance {std::numeric_limits<double>::infinity()};

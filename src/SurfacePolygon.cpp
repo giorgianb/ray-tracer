@@ -5,7 +5,7 @@ SurfacePolygon::SurfacePolygon(const Polygon p, const Color c):
 	_poly {p}, _color {c} {
 }
 
-MaybeVector SurfacePolygon::intersection(const Line& ray) const {
+MaybeVector SurfacePolygon::intersection(const Ray& ray) const {
 	using ::intersection;
 
 	const Intersection inter {intersection(_poly, ray)};

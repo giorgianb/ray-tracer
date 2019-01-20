@@ -10,7 +10,7 @@ Plane SurfacePlane::plane() const {
 	return _plane;
 }
 
-MaybeVector SurfacePlane::intersection(const Line& ray) const {
+MaybeVector SurfacePlane::intersection(const Ray& ray) const {
 	using ::intersection;
 
 	const Intersection s {intersection(_plane, ray)};

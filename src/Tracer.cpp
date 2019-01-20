@@ -42,9 +42,7 @@ PPMImage trace(const SurfaceList& world,
 			MaybeVector hit {};
 			for (const auto& surface: world) {
 				const MaybeVector phit {surface->intersection(ray)};
-				// also assures us that it is in front of the eye
-				if (phit && magnitude(*phit - eye) < distance
-						&& (*phit - eye) * to_plane > 0) {
+				if (phit && magnitude(*phit - eye) < distance) {
 					s = surface;
 					hit = *phit;
 					distance = magnitude(*phit - eye);

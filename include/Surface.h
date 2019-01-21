@@ -19,4 +19,5 @@ class Surface {
 };
 
 using SurfaceList = std::vector<Surface*>;
+using ColorList = std::vector<Color>;
 #endif

@@ -1,11 +1,12 @@
 #include "Tracer.h"
+#include "LightSource.h"
+#include "PointLightSource.h"
 #include "Surface.h"
 #include "Sphere.h"
 #include "SurfacePlane.h"
 #include "Line.h"
 #include "SurfacePolygon.h"
-#include "LightSource.h"
-#include "PointLightSource.h"
+#include "CheckeredPlane.h"
 
 #include <iostream>
 #include <vector>
@@ -195,6 +196,22 @@ World read_world(std::istream& in)
 			double r, g, b;
 			in >> r >> g >> b;
 			s.push_back(new SurfacePolygon {{base, vertices}, {r, g, b}});
+		} else if (item == "CheckeredPlane") {
+			double ux, uy, uz, vx, vy, vz, ox, oy, oz;
+			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz;
+
+			size_t ncolors;
+			ColorList colors;
+
+			in >> ncolors;
+			for (size_t i {0}; i < ncolors; ++i) {
+				double r, g, b;
+				in >> r >> g >> b;
+				colors.push_back({r, g, b});
+			}
+
+			s.push_back(new CheckeredPlane 
+					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, colors});
 		} else if (item == "PointLightSource") {
 			double pos_x, pos_y, pos_z, brightness;
 			in >> pos_x >> pos_y >> pos_z >> brightness;

@@ -40,7 +40,7 @@ v3_x v3_y v3_z
 vn_x vn_y vn_z
 r g b
 ```
-The first part specifies the plane that the polygon has on. It is specified in the same manner as mentioned above, in the `Plane` section: where the plane is specified in the form `s(ux, uy, uz) + t(vx, vy, vz) + (ox, oy, oz)`. Then, the number of vertices of the polygon is specified. **Important**: This will always be one more than the actual number of vertices of the Polygon. For example, if the you want to specify a triangle, the number of vertices will be 4. **This is because the first and last vertex must be the same.** Then, after the number of vertices is specified, the vertices are listed **in a counterclockwise manner***. Lastly, `r`, `g`, and `b` speciy the red, green, and blue value of the polygon respectively and must be between `0` and `1`.
+The first part specifies the plane that the polygon has on. It is specified in the same manner as mentioned above, in the `Plane` section: where the plane is specified in the form `s(ux, uy, uz) + t(vx, vy, vz) + (ox, oy, oz)`. Then, the number of vertices of the polygon is specified. **Important**: This will always be one more than the actual number of vertices of the Polygon. For example, if the you want to specify a triangle, the number of vertices will be 4. **This is because the first and last vertex must be the same.** Then, after the number of vertices is specified, the vertices are listed **in a counterclockwise manner**. Lastly, `r`, `g`, and `b` speciy the red, green, and blue value of the polygon respectively and must be between `0` and `1`.
 
 ### Point Light Sources
 Point light sources are specified in the following manner:

@@ -4,6 +4,8 @@
 #include "SurfacePlane.h"
 #include "Line.h"
 #include "SurfacePolygon.h"
+#include "LightSource.h"
+#include "PointLightSource.h"
 
 #include <iostream>
 #include <vector>
@@ -13,16 +15,12 @@
 #include <fstream>
 #include <getopt.h>
 
-// TODO: remove, only included for debugging purposes
-#include <set>
-#include "Debug.h"
-
-SurfaceList read_surfaces(std::istream& in);
+World read_world(std::istream& in);
 
 enum command_line_options
 {
 	input_file, output_file, x_resolution, y_resolution, 
-	x_min, x_max, y_min, y_max, offset, eye_x, eye_y, eye_z, brightness, help
+	x_min, x_max, y_min, y_max, offset, eye_x, eye_y, eye_z, help
 };
 
 
@@ -40,7 +38,6 @@ int main(int argc, char *argv[]) {
 		{"eye-x", required_argument, nullptr, eye_x},
 		{"eye-y", required_argument, nullptr, eye_y},
 		{"eye-z", required_argument, nullptr, eye_z},
-		{"brightness", required_argument, nullptr, brightness},
 		{"help", no_argument, NULL, help},
 		{0, 0, 0, 0}
 	};
@@ -103,9 +100,6 @@ int main(int argc, char *argv[]) {
 				sscanf(optarg, "%d", &z);
 				eye.z(z);
 				break;
-			case brightness:
-				sscanf(optarg, "%lf", &b);
-				break;
 			case help:
 			{
 				static const char *const help_message = 
@@ -121,7 +115,6 @@ int main(int argc, char *argv[]) {
 				"--eye-x, --eye-x=\t\tSpecifies x-coordinate of eye.\n"
 				"--eye-y, --eye-y=\t\tSpecifies y-coordinate of eye.\n"
 				"--eye-z, --eye-z=\t\tSpecifies z-coordinate of eye.\n"
-				"--brightness, --brightness=\tSpecifies brightness.\n\n\n"
 				"If no input file is provided, shapes are read from standard input.";
 				std::cout << help_message << '\n';
 
@@ -147,16 +140,15 @@ int main(int argc, char *argv[]) {
 		<< upper.first << ", " << upper.second << ")\n";
 	std::cout << "Viewing Plane " << plane_offset << " in front of the eye.\n";
 	std::cout << "Eye located at: (" << eye.x() << ", " << eye.y() << ", " << eye.z() << ")\n";
-	std::cout << "Brightness: " << b << '\n';
 
-	SurfaceList world;
+	World world;
 	if (file_name) {
 		std::ifstream in {file_name};
-		world = read_surfaces(in);
+		world = read_world(in);
 	} else
-		world = read_surfaces(std::cin);
+		world = read_world(std::cin);
 
-	const PPMImage traced {trace(world, eye, resolution, lower, upper, plane_offset, b)};
+	const PPMImage traced {trace(world, eye, resolution, lower, upper, plane_offset)};
 
 	std::ofstream out {output_file_name};
 	out << "P3 " << resolution.first << ' ' << resolution.second << ' ' << 255 << '\n';
@@ -168,21 +160,22 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-SurfaceList read_surfaces(std::istream& in)
+World read_world(std::istream& in)
 {
-	SurfaceList l;
-	std::string shape;
-	while (in >> shape) {
-		if (shape == "Sphere") {
+	SurfaceList s;
+	LightSourceList l;
+	std::string item;
+	while (in >> item) {
+		if (item == "Sphere") {
 			double pos_x, pos_y, pos_z, radius, r, g, b;
 			in >> pos_x >> pos_y >> pos_z >> radius >> r >> g >> b;
-			l.push_back(new Sphere {Vector {pos_x, pos_y, pos_z}, radius, {r, g, b}});
-		} else if (shape == "Plane") {
+			s.push_back(new Sphere {Vector {pos_x, pos_y, pos_z}, radius, {r, g, b}});
+		} else if (item == "Plane") {
 			double ux, uy, uz, vx, vy, vz, ox, oy, oz, r, g, b;
 			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz >> r >> g >> b;
-			l.push_back(new SurfacePlane 
+			s.push_back(new SurfacePlane 
 					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, {r, g, b}});
-		} else if (shape == "Polygon") {
+		} else if (item == "Polygon") {
 			double ux, uy, uz, vx, vy, vz, ox, oy, oz;
 
 			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz;
@@ -201,9 +194,14 @@ SurfaceList read_surfaces(std::istream& in)
 
 			double r, g, b;
 			in >> r >> g >> b;
-			l.push_back(new SurfacePolygon {{base, vertices}, {r, g, b}});
+			s.push_back(new SurfacePolygon {{base, vertices}, {r, g, b}});
+		} else if (item == "PointLightSource") {
+			double pos_x, pos_y, pos_z, brightness;
+			in >> pos_x >> pos_y >> pos_z >> brightness;
+
+			l.push_back(new PointLightSource {{pos_x, pos_y, pos_z}, brightness});
 		}
 	}
 
-	return l;
+	return {l, s};
 }

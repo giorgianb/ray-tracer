@@ -1,3 +1,7 @@
+PointLightSource
+0 -300 1500 200000
+PointLightSource
+0 500 500 200000
 Sphere
 100.0 0.0 1000	50	1 0 0
 Sphere

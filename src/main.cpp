@@ -1,4 +1,4 @@
-#include "Tracer.h"
+#include "Render.h"
 #include "LightSource.h"
 #include "PointLightSource.h"
 #include "Surface.h"
@@ -149,16 +149,22 @@ int main(int argc, char *argv[]) {
 	} else
 		world = read_world(std::cin);
 
-	const PPMImage traced {trace(world, eye, resolution, lower, upper, plane_offset)};
+	const PPMImage rendered {render(world, eye, resolution, lower, upper, plane_offset)};
 
 	std::ofstream out {output_file_name};
 	out << "P3 " << resolution.first << ' ' << resolution.second << ' ' << 255 << '\n';
 	for (size_t j = 0; j < resolution.second; ++j)
 		for (size_t i = 0; i < resolution.first; ++i)
-			out << (int) traced[i][j].r << ' '
-				<< (int) traced[i][j].b << ' '
-				<< (int) traced[i][j].g << '\n';
+			out << (int) rendered[i][j].r << ' '
+				<< (int) rendered[i][j].b << ' '
+				<< (int) rendered[i][j].g << '\n';
 	return 0;
+}
+
+Material read_material(std::istream& in) {
+	double reflectivity, refractivity, transparency, diffusivity, r, g, b;
+	in >> reflectivity >> refractivity >> transparency >> diffusivity >> r >> g >> b;
+	return {reflectivity, refractivity, transparency, diffusivity, {r, g, b}};
 }
 
 World read_world(std::istream& in)
@@ -168,14 +174,16 @@ World read_world(std::istream& in)
 	std::string item;
 	while (in >> item) {
 		if (item == "Sphere") {
-			double pos_x, pos_y, pos_z, radius, r, g, b;
-			in >> pos_x >> pos_y >> pos_z >> radius >> r >> g >> b;
-			s.push_back(new Sphere {Vector {pos_x, pos_y, pos_z}, radius, {r, g, b}});
+			double pos_x, pos_y, pos_z, radius;
+			in >> pos_x >> pos_y >> pos_z >> radius;
+			const Material m {read_material(in)};
+			s.push_back(new Sphere {{pos_x, pos_y, pos_z}, radius, m});
 		} else if (item == "Plane") {
-			double ux, uy, uz, vx, vy, vz, ox, oy, oz, r, g, b;
-			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz >> r >> g >> b;
+			double ux, uy, uz, vx, vy, vz, ox, oy, oz;
+			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz;
+			const Material m {read_material(in)};
 			s.push_back(new SurfacePlane 
-					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, {r, g, b}});
+					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, m});
 		} else if (item == "Polygon") {
 			double ux, uy, uz, vx, vy, vz, ox, oy, oz;
 
@@ -193,25 +201,23 @@ World read_world(std::istream& in)
 			}
 
 
-			double r, g, b;
-			in >> r >> g >> b;
-			s.push_back(new SurfacePolygon {{base, vertices}, {r, g, b}});
+			const Material m {read_material(in)};
+			s.push_back(new SurfacePolygon {{base, vertices}, m});
 		} else if (item == "CheckeredPlane") {
 			double ux, uy, uz, vx, vy, vz, ox, oy, oz;
 			in >> ux >> uy >> uz >> vx >> vy >> vz >> ox >> oy >> oz;
 
-			size_t ncolors;
-			ColorList colors;
+			size_t nmaterials;
+			MaterialList materials;
 
-			in >> ncolors;
-			for (size_t i {0}; i < ncolors; ++i) {
-				double r, g, b;
-				in >> r >> g >> b;
-				colors.push_back({r, g, b});
+			in >> nmaterials;
+			for (size_t i {0}; i < nmaterials; ++i) {
+				const Material m {read_material(in)};
+				materials.push_back(m);
 			}
 
 			s.push_back(new CheckeredPlane 
-					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, colors});
+					{{{ux, uy, uz}, {vx, vy, vz}, {ox, oy, oz}}, materials});
 		} else if (item == "PointLightSource") {
 			double pos_x, pos_y, pos_z, brightness;
 			in >> pos_x >> pos_y >> pos_z >> brightness;

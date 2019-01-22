@@ -1,5 +1,5 @@
-#ifndef __RAY_TRACER_TRACER_INCLUDED
-#define __RAY_TRACER_TRACER_INCLUDED
+#ifndef __RAY_TRACER_RENDER_INCLUDED
+#define __RAY_TRACER_RENDER_INCLUDED
 
 #include "Surface.h"
 #include "LightSource.h"
@@ -17,10 +17,14 @@ using World = std::pair<LightSourceList, SurfaceList>;
 using ResSpec = std::pair<size_t, size_t>;
 using Corner = std::pair<int, int>;
 
-PPMImage trace(const World& world, 
+PPMImage render(const World& world, 
 		const Vector& eye,
 		const ResSpec& resolution, 
 		const Corner& c1, 
 		const Corner& c2,
 		const double plane_offset);
+
+
+constexpr bias {10*Float::epsilon};
+
 #endif

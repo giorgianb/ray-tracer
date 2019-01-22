@@ -8,13 +8,14 @@
 class CheckeredPlane: public Surface {
 	private:
 		const Plane _plane;
-		const ColorList _colors;
+		const MaterialList _materials;
 	public:
 		MaybeVector intersection(const Ray& r) const;
 		Vector normal(const Vector& point, const Vector& light) const;
-		Color color(const Vector& point) const;
+		MaybeVector transmit(const Ray& ray) const;
+		Material material(const Vector& point) const;
 
-		CheckeredPlane(const Plane p, const ColorList& colors);
+		CheckeredPlane(const Plane p, const MaterialList& materials);
 		Plane plane() const;
 };
 #endif

@@ -1,8 +1,8 @@
 #include "SurfacePolygon.h"
 #include "PolygonUtils.h"
 
-SurfacePolygon::SurfacePolygon(const Polygon p, const Color c): 
-	_poly {p}, _color {c} {
+SurfacePolygon::SurfacePolygon(const Polygon p, const Material m): 
+	_poly {p}, _material {m} {
 }
 
 MaybeVector SurfacePolygon::intersection(const Ray& ray) const {
@@ -24,6 +24,10 @@ Vector SurfacePolygon::normal(const Vector& point, const Vector& light) const {
 	return n*v > 0 ? n : -n;
 }
 
-Color SurfacePolygon::color(const Vector& point) const {
-	return _color;
+MaybeVector SurfacePolygon::transmit(const Ray& ray) const {
+	return ray.offset();
+}
+
+Material SurfacePolygon::material(const Vector& point) const {
+	return _material;
 }

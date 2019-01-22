@@ -4,10 +4,10 @@
 #include <cassert>
 #include <cmath>
 
-CheckeredPlane::CheckeredPlane(const Plane p, const ColorList& colors):
+CheckeredPlane::CheckeredPlane(const Plane p, const MaterialList& materials):
 	_plane {p},
-	_colors {colors} {
-		assert(colors.size() > 0);
+	_materials {materials} {
+		assert(materials.size() > 0);
 }
 
 Plane CheckeredPlane::plane() const {
@@ -22,6 +22,10 @@ MaybeVector CheckeredPlane::intersection(const Ray& ray) const {
 		return *vp;
 	else
 		return {};
+}
+
+MaybeVector CheckeredPlane::transmit(const Ray& ray) const {
+	return ray.offset();
 }
 
 Vector CheckeredPlane::normal(const Vector& point, const Vector& light) const {
@@ -48,9 +52,9 @@ double get_first_basis(const Line& l1, const Line& l2) {
 	return (hm/km)*sign;
 }
 
-Color CheckeredPlane::color(const Vector& point) const {
+Material CheckeredPlane::material(const Vector& point) const {
 	const double s {get_first_basis({_plane.u(), _plane.offset()}, {_plane.v(), point})};
 	const double t {get_first_basis({_plane.v(), _plane.offset()}, {_plane.u(), point})};
 
-	return _colors[static_cast<int>(std::round(s) + std::round(t)) % _colors.size()];
+	return _materials[static_cast<int>(std::round(s) + std::round(t)) % _materials.size()];
 }

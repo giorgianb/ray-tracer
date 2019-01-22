@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-SurfacePlane::SurfacePlane(const Plane p, const Color c): _plane {p}, _color {c} {
+SurfacePlane::SurfacePlane(const Plane p, const Material c): _plane {p}, _material {c} {
 }
 
 Plane SurfacePlane::plane() const {
@@ -29,7 +29,12 @@ Vector SurfacePlane::normal(const Vector& point, const Vector& light) const {
 	return n*v > 0 ? n : -n;
 }
 
-Color SurfacePlane::color(const Vector& point) const {
+
+MaybeVector SurfacePlane::transmit(const Ray& ray) const {
+	return ray.offset();
+}
+
+Material SurfacePlane::material(const Vector& point) const {
 	// TODO: add some insertion to make sure the point is in the plane
-	return _color;
+	return _material;
 }

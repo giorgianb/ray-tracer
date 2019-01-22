@@ -3,6 +3,9 @@ import sys
 from random import randrange
 import math
 
+def rgb(r, g, b):
+    return (r / 255.0, g / 255.0, b / 255.0)
+
 def roundt(t):
     l = []
     for i in t:
@@ -10,9 +13,98 @@ def roundt(t):
     return tuple(l)
 
 def main():
-    colors = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
+    colors = [
+            rgb(255, 0, 0), 
+            rgb(255, 127, 0), 
+            rgb(255, 255, 0), 
+            rgb(0, 255, 0), 
+            rgb(0, 0, 255),
+            rgb(139, 0, 255)
+            ]
     with open(sys.argv[1], 'w') as f:
+        print("""
+PointLightSource
+0 0 -250 2000000
+""", file=f)
+        print("""
+PointLightSource
+0 0 1500 2000000
+""", file=f)
+        print("""
+PointLightSource
+0 1500 300 2000000
+""", file=f)
+ 
+        print("""
+CheckeredPlane
+200 0 -400	0 0 400		200 -1000 400
+3
+0 0 0 1 1 1 0
+1 0 0 0 1 0 1
+0 0 0 1 0 1 1""", file=f)
+        print("""
+CheckeredPlane
+100 0 -100	0 0 100		200 400 400
+3
+0 0 0 1 1 0 0
+0 0 0 1 0 1 0
+0 0 0 1 0 0 1""", file=f)
 
+        # Fill in
+        write_sphere
+        radius = 300
+        NSPHERES = 20
+        for i in range(NSPHERES):
+            theta = i * 2*math.pi / NSPHERES
+            write_sphere(
+                    define_sphere(
+                        define_material(
+                            0, # reflectivity
+                            0, # refractivity
+                            0, # transparancy
+                            1, # diffusivity
+                            colors[i % len(colors)]
+                        ), 
+                        50, # radius
+                        radius * math.cos(theta),
+                        radius * math.sin(theta),
+                        1000
+                    ),
+                    f
+            )
+#        write_sphere(
+#                define_sphere(
+#                    define_material(
+#                            0, # reflectivity
+#                            0, # refractivity
+#                            0, # transparancy
+#                            1, # diffusivity
+#                            colors[0] # shouldn't matter
+#                        ), 
+#                    50, # radius
+#                    0,
+#                    0,
+#                    1000
+#                ),
+#                f
+#        )
+
+        write_sphere(
+                define_sphere(
+                    define_material(
+                            1, # reflectivity
+                            0, # refractivity
+                            0, # transparancy
+                            0, # diffusivity
+                            colors[0] # shouldn't matter
+                        ), 
+                    250, # radius
+                    0,
+                    0,
+                    2000
+                ),
+                f
+        )
 
 def scale(k, v):
     return tuple(k*e for e in v)
@@ -20,15 +112,33 @@ def scale(k, v):
 def add(u, v):
     return tuple(sum(z) for z in zip(u, v))
 
-def define_sphere(color, radius, x, y, z):
-    return ((x, y, z, radius), color)
+def define_color(r, g, b):
+    return (r, g, b)
+
+def define_material(
+        reflectivity,
+        refractivity,
+        transparancy,
+        diffusivity,
+        color):
+    return (reflectivity, refractivity, transparancy, diffusivity, color)
+
+def define_sphere(material, radius, x, y, z):
+    return ((x, y, z, radius), material)
 
 def write_sphere(sphere, file=sys.stdout):
     print("Sphere", file=file)
     # syntax for sphere
     x, y, z, radius = sphere[0]
-    print("{} {} {}\t{}\t{} {} {}".format(*sphere[0], *sphere[1]), file=file)
+    print("{} {} {}\t{}".format(*sphere[0]), file=file)
+    write_material(sphere[1], file)
 
+def write_color(color, file=sys.stdout):
+    print("{} {} {}".format(*color), file=file)
+
+def write_material(material, file=sys.stdout):
+    print("{} {} {} {}".format(*material[:4]), file=file)
+    write_color(material[4], file)
 
 def define_plane_from_points(color, p1, p2, p3):
     u = add(p3, scale(-1, p1))

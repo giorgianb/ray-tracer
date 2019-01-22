@@ -6,11 +6,20 @@
 #include <limits>
 #include <cmath>
 #include <iostream>
+#include <optional>
 
 std::pair<MaybeVector, Surface*> find_closest_hit(const Ray& r, 
 		const Vector& point,
 		const SurfaceList& sl);
 Color trace(const Ray& ray, const LightSourceList& ll, const SurfaceList& sl);
+Color illuminate(const Vector& point, const LightSourceList& ll, const SurfaceList& sl);
+Ray with_bias(const Ray& ray);
+Vector reflect(const Ray& ray, const Vector& normal);
+MaybeVector refract(const Ray& ray, const Vector& normal, const double n1, const double n2);
+double incident_angle(const Ray& ray, const Vector& normal);
+std::optional<double> refracted_angle(const double n1, const double t1, const double n2);
+double reflected_portion(const double n1, const double t1, const double n2, const double t2);
+
 
 PPMImage render(const World& world, 
 		const Vector& eye,
@@ -42,7 +51,6 @@ PPMImage render(const World& world,
 			// Ray from our eye to our current (x, y)
 			const Vector to_plane {Vector {x, y, plane_offset + eye.z()} - eye};
 			const Ray ray {to_plane, eye};
-
 			rendered[i][j] = trace(ray, ll, sl);
 		}
 	}
@@ -68,19 +76,124 @@ std::pair<MaybeVector, Surface*> find_closest_hit(const Ray& r,
 	return {hit, s};
 }
 
+#include "Debug.h"
+#include "Sphere.h"
+
+const Sphere* get_sphere(Surface* s) {
+	return dynamic_cast<const Sphere*>(s);
+}
+
+
+// TODO: figure out how to add tinting
+unsigned doing_reflection {0};
+bool reflecting {false};
+Color trace(const Ray& ray, const LightSourceList& ll, const SurfaceList& sl) {
+	const auto [hit, s] = find_closest_hit(ray, ray.offset(), sl);
+	Color color {0, 0, 0};
+
+	if (reflecting && hit && s) {
+		std::cerr << doing_reflection << " " << ray << "hit: " << *hit << "\nof object at: ";
+		if (auto sphere = get_sphere(s))
+			std::cerr << sphere->pos();
+		std::cerr << '\n';
+	}
+
+	if (hit && s) {
+		color = illuminate(*hit, ll, sl);
+		if (reflecting)
+			std::cerr << doing_reflection << " color: (" << color.r << ", " << color.g << ", " << color.b << ")\n";
+
+		const Material m {s->material(*hit)};
+		// TODO: convert normal and rf back to {} initialization
+		const Vector normal = s->normal(*hit, ray.offset());
+
+		if (m.reflectivity > 0) {
+			reflecting = true;
+			// reflect, tracg, scale by reflectivity and add to color
+			++doing_reflection;
+			std::cerr << doing_reflection << " incident: " << ray << '\n';
+			std::cerr << doing_reflection << " normal: " << normal << '\n';
+			const Ray rf {with_bias({reflect(ray, normal), *hit})};
+			std::cerr << doing_reflection << " reflection: " << rf << '\n';
+			const Color rc {trace(rf, ll, sl)};
+			reflecting = false;
+
+			std::cerr << doing_reflection << " reflected color: (" << rc.r << ", " << rc.g << ", " << rc.b << ")\n";
+			color.r += rc.r * m.reflectivity;
+			color.b += rc.b * m.reflectivity;
+			color.g += rc.g * m.reflectivity;
+		}
+	}
+	return color;
+}
+
+// TODO: deal with being inside/outside the medium
+MaybeVector refract(const Ray& ray, const Vector& normal, const double n1, const double n2) {
+	const double t1 {incident_angle(ray, normal)};
+	if (const auto t2 = refracted_angle(n1, t1, n2)) {
+		const double n {n1/n2};
+		const Vector nn {normalize(normal)};
+		const Vector dn {normalize(ray.direction())};
+		const double c1 {nn*dn};
+		const double c2 {std::sqrt(1 - n*n*std::sin(*t2)*std::sin(*t2))};
+
+		return n*dn + nn*(n*c1 - c2);
+	} 
+
+	return {};
+}
+
+#include <cassert>
+Vector reflect(const Ray& ray, const Vector& normal) {
+	const Vector I {normalize(ray.direction())};
+	const Vector N {normalize(normal)};
+
+	const Vector r {normalize(I - 2 * (N * I) * N)};
+	if (std::fabs(r * N + I * N) >= Float::epsilon) {
+		std::cerr << r * N << " " << I * N << '\n';
+		assert(false);
+	}
+	return r;
+}
+
+double incident_angle(const Ray& ray, const Vector& normal) {
+	return normalize(normal) * normalize(ray.direction());
+}
+
+// returns reflected light
+double fresnel(const double n1, const double t1, const double n2, const double t2) {
+	const double ct1 {std::cos(t1)};
+	const double ct2 {std::cos(t2)};
+	const double frp {(n2*ct1 - n1*ct2)/(n2*ct1 + n1*ct2)};
+	const double frn {(n1*ct2 - n2*ct1)/(n1*ct2 + n2*ct1)};
+
+	return 1.0/2.0 * (frp*frp + frn*frn);
+}
+
+// returns theta_2 from snell's law
+std::optional<double> refracted_angle(const double n1, const double t1, const double n2) {
+	if (n1/n2 * std::sin(t1) <= 1)
+		return std::asin(n1/n2 * sin(t1));
+
+	return {};
+}
+
 // bias so that after reflections/refractions we don't hit the same points twice
 Ray with_bias(const Ray& ray) {
 	return {ray.direction(), ray.offset() + ray.direction() * bias};
 }
 
 // handles diffuse reflection
-Color illuminate(const Vector& point, LightSourceList& ll, const SurfaceList& sl) {
+Color illuminate(const Vector& point, const LightSourceList& ll, const SurfaceList& sl) {
 	Color color {0, 0, 0};
 	for (const auto& light: ll) {
 		const Ray ray {point - light->position(), light->position()};
 
 		const auto [hit, s] = find_closest_hit(ray, light->position(), sl);
 		if (hit && s && *hit == point) {
+			auto sphere = get_sphere(s);
+			if (sphere && reflecting)
+				std::cerr << doing_reflection << " " << point << " illuminated " << sphere->pos() << '\n';
 			const Vector pos {light->position()};
 			const Vector dir {ray.direction()};
 			const Material m {s->material(*hit)};
@@ -96,104 +209,8 @@ Color illuminate(const Vector& point, LightSourceList& ll, const SurfaceList& sl
 		}
 	}
 
-	return color;
-}
-
-constexpr Ray reflect(const Vector& normal, const Ray& ray) noexcept {
-	const Vector nn {normalize(normal)};
-	const Vector nd {normalize(ray.direction())};
-
-	return nd - nn * ((nn * nd) * 2);
-}
-
-constexpr double theta(const Vector& normal, const Ray& ray) noexcept {
-	return normalize(normal) * normalize(ray.direction());
-}
-
-// returns reflected light
-constexpr double fresnel(
-		const double& n1, 
-		const double& t1, 
-		const double& n2, 
-		const double& t2
-		) noexcept {
-	const double ct1 {std::cos(t1)};
-	const double ct2 {std::cos(t2)};
-	const double frp {(n2*ct1 - n1*ct2)/(n2*ct1 + n1*ct2)};
-	const double frn {(n1*ct2 - n2*ct1)/(n1*ct2 + n2*ct1)};
-
-	return 1.0/2.0 * (frp*frp + frn*frn);
-}
-
-// returns theta_2 from snell's law
-constexpr double snell(const double n1, const double t1, const double n2) {
-	return std::asin(n1/n2 * sin(t1));
-}
-
-// TODO: deal with being inside/outside the medium
-constexpr double refract(
-		const Vector& normal, 
-		const Ray& ray,
-		const double n1,
-		const double t1,
-		const double n2,
-		const double t2
-		) noexcept {
-	const double n {n1/n2};
-	const double nn {normalize(normal)};
-	const double dn {normalize(ray.direction())};
-	const double c1 {nn*dn}';
-	const double c2 {std::sqrt(1 - n*n*std::sin(t2)*std::sin(t2))};
-
-	return n*dn + nn*(n*c1 - c2);
-}
-
-// TODO: figure out how to add tinting
-Color trace(const Ray& ray, const LightSourceList& ll, const SurfaceList& sl) {
-	const auto [hit, s] = find_closest_hit(ray, ray->offset(), sl);
-	Color color {0, 0, 0};
-	if (hit && s) {
-		color = illuminate(*hit, ll, sl);
-		const Material m {s->material(*hit)};
-		const Veoctor normal {s->normal(*hit, ray.offset())};
-		if (m.reflectivity > 0) {
-			// reflect, trace, scale by reflectivity and add to color
-			const Ray rf {with_bias(reflect(normal, ray))};
-			const Color rc {trace(rf, ll, sl)};
-			color.r += rc.r * m.reflectivity;
-			color.b += rc.b * m.reflectivity;
-			color.g += rc.g * m.reflectivity;
-		}
-
-		if (m.transparency > 0) {
-			// refract AND reflect, scale by refraction by transparancy and add to color
-			const Material m {s->material(*hit)};
-			const double n1 {1};
-			const double t1 {theta(normal, ray)};
-			const double n2 {m.refractivity};
-			const double t2 {snell(n1, t1, n2)};
-
-			// deal with reflected portion
-			const double reflectivity {fresnel(n1, t1, n2, t2)};
-			const Ray rf {with_bias(reflect(s->normal(*hit, ray.offset()), ray))};
-			const Color rc {trace(rf, ll, sl)};
-			color.r += rc.r * reflectivity;
-			color.b += rc.b * reflectivity;
-			color.g += rc.g * reflectivity;
-
-			// deal with refracted portion
-			const Ray rt {refract(normal, ray, n1, t1, n2, t2)};
-			if (const auto out = s->transmit(rt)) {
-				// TODO: for now we will assume that the surface is made out of
-				// a uniform material and thus theta_in = theta_out
-				const Ray rt {with_bias({ray.direction(), *out})};
-				const Color rc {trace(rt, ll, sl)};
-				color.r += rc.r * m.transparancy * (1 - reflectivity);
-				color.b += rc.b * m.transparancy * (1 - reflectivity);
-				color.g += rc.g * m.transparancy * (1 - reflectivity);
-			}
-		}
-	}
+	if (reflecting && color.r == 0 && color.g == 0 && color.b == 0)
+		std::cerr << doing_reflection << " " << point << " not illuminated\n";
 
 	return color;
 }

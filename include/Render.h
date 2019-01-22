@@ -9,7 +9,19 @@
 
 struct PPMColor {
 	unsigned char r, g, b;
+	constexpr PPMColor() noexcept;
+	constexpr PPMColor(const Color& c) noexcept;
 };
+
+constexpr PPMColor::PPMColor(const Color& c) noexcept:
+	r {static_cast<unsigned char>(std::min(255.0, std::round(c.r * 255)))},
+	b {static_cast<unsigned char>(std::min(255.0, std::round(c.b * 255)))},
+	g {static_cast<unsigned char>(std::min(255.0, std::round(c.g * 255)))} {
+}
+
+
+constexpr PPMColor::PPMColor() noexcept: r {}, b {}, g {} {
+}
 
 using PPMImage = std::vector<std::vector<PPMColor>>;
 
@@ -25,6 +37,6 @@ PPMImage render(const World& world,
 		const double plane_offset);
 
 
-constexpr bias {10*Float::epsilon};
+constexpr double bias {1000*Float::epsilon};
 
 #endif

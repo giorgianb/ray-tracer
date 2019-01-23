@@ -12,6 +12,11 @@ def roundt(t):
         l.append(round(i, 3))
     return tuple(l)
 
+def rotate_xz(x, y, z, theta):
+    return [x*math.cos(theta) + z*-math.sin(theta), 
+            1,
+            x*math.sin(theta) + z*math.cos(theta)]
+
 def main():
     colors = [
             rgb(255, 0, 0), 
@@ -28,12 +33,17 @@ PointLightSource
 """, file=f)
         print("""
 PointLightSource
-0 0 1500 2000000
+0 0 1250 4000000
 """, file=f)
         print("""
 PointLightSource
-0 1500 300 2000000
+0 0 2000 4000000
 """, file=f)
+        print("""
+PointLightSource
+0 0 4000 8000000
+""", file=f)
+
  
         print("""
 CheckeredPlane
@@ -56,22 +66,53 @@ CheckeredPlane
         NSPHERES = 20
         for i in range(NSPHERES):
             theta = i * 2*math.pi / NSPHERES
+            pos =  rotate_xz(
+                    radius * math.cos(theta),
+                    radius * math.sin(theta),
+                    0,
+                    math.pi/4
+                    )
+
+            pos[2] += 1000
+
             write_sphere(
                     define_sphere(
                         define_material(
-                            0, # reflectivity
+                            .5, # reflectivity
                             0, # refractivity
                             0, # transparancy
-                            1, # diffusivity
+                            .5, # diffusivity
                             colors[i % len(colors)]
                         ), 
                         50, # radius
-                        radius * math.cos(theta),
-                        radius * math.sin(theta),
-                        1000
+                        *pos
                     ),
                     f
             )
+
+            pos = rotate_xz(
+                    0,
+                    radius * math.cos(theta),
+                    radius * math.sin(theta),
+                    math.pi/4)
+
+            pos[2] += 1000
+
+            write_sphere(
+                    define_sphere(
+                        define_material(
+                            .25, # reflectivity
+                            0, # refractivity
+                            0, # transparancy
+                            .75, # diffusivity
+                            colors[i % len(colors)]
+                        ), 
+                        50, # radius
+                        *pos
+                        ),
+                    f
+            )
+#
 #        write_sphere(
 #                define_sphere(
 #                    define_material(
@@ -89,23 +130,23 @@ CheckeredPlane
 #                f
 #        )
 
-        write_sphere(
-                define_sphere(
-                    define_material(
-                            1, # reflectivity
-                            0, # refractivity
-                            0, # transparancy
-                            0, # diffusivity
-                            colors[0] # shouldn't matter
-                        ), 
-                    250, # radius
-                    0,
-                    0,
-                    2000
-                ),
-                f
-        )
-
+#        write_sphere(
+#                define_sphere(
+#                    define_material(
+#                            1, # reflectivity
+#                            0, # refractivity
+#                            0, # transparancy
+#                            0, # diffusivity
+#                            colors[0] # shouldn't matter
+#                        ), 
+#                    250, # radius
+#                    0,
+#                    0,
+#                    1000
+#                ),
+#                f
+#        )
+#
 def scale(k, v):
     return tuple(k*e for e in v)
 

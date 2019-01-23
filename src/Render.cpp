@@ -76,14 +76,6 @@ std::pair<MaybeVector, Surface*> find_closest_hit(const Ray& r,
 	return {hit, s};
 }
 
-#include "Debug.h"
-#include "Sphere.h"
-
-const Sphere* get_sphere(Surface* s) {
-	return dynamic_cast<const Sphere*>(s);
-}
-
-
 // TODO: figure out how to add tinting
 Color trace(const Ray& ray, const LightSourceList& ll, const SurfaceList& sl) {
 	const auto [hit, s] = find_closest_hit(ray, ray.offset(), sl);
@@ -123,7 +115,6 @@ MaybeVector refract(const Ray& ray, const Vector& normal, const double n1, const
 	return {};
 }
 
-#include <cassert>
 Vector reflect(const Ray& ray, const Vector& normal) {
 	const Vector I {normalize(ray.direction())};
 	const Vector N {normalize(normal)};

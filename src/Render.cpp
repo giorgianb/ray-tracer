@@ -85,40 +85,20 @@ const Sphere* get_sphere(Surface* s) {
 
 
 // TODO: figure out how to add tinting
-unsigned doing_reflection {0};
-bool reflecting {false};
 Color trace(const Ray& ray, const LightSourceList& ll, const SurfaceList& sl) {
 	const auto [hit, s] = find_closest_hit(ray, ray.offset(), sl);
 	Color color {0, 0, 0};
 
-	if (reflecting && hit && s) {
-		std::cerr << doing_reflection << " " << ray << "hit: " << *hit << "\nof object at: ";
-		if (auto sphere = get_sphere(s))
-			std::cerr << sphere->pos();
-		std::cerr << '\n';
-	}
-
 	if (hit && s) {
 		color = illuminate(*hit, ll, sl);
-		if (reflecting)
-			std::cerr << doing_reflection << " color: (" << color.r << ", " << color.g << ", " << color.b << ")\n";
-
 		const Material m {s->material(*hit)};
-		// TODO: convert normal and rf back to {} initialization
-		const Vector normal = s->normal(*hit, ray.offset());
+		const Vector normal {s->normal(*hit, ray.offset())};
 
 		if (m.reflectivity > 0) {
-			reflecting = true;
-			// reflect, tracg, scale by reflectivity and add to color
-			++doing_reflection;
-			std::cerr << doing_reflection << " incident: " << ray << '\n';
-			std::cerr << doing_reflection << " normal: " << normal << '\n';
+			// reflect, trace, scale by reflectivity and add to color
 			const Ray rf {with_bias({reflect(ray, normal), *hit})};
-			std::cerr << doing_reflection << " reflection: " << rf << '\n';
 			const Color rc {trace(rf, ll, sl)};
-			reflecting = false;
 
-			std::cerr << doing_reflection << " reflected color: (" << rc.r << ", " << rc.g << ", " << rc.b << ")\n";
 			color.r += rc.r * m.reflectivity;
 			color.b += rc.b * m.reflectivity;
 			color.g += rc.g * m.reflectivity;
@@ -148,12 +128,7 @@ Vector reflect(const Ray& ray, const Vector& normal) {
 	const Vector I {normalize(ray.direction())};
 	const Vector N {normalize(normal)};
 
-	const Vector r {normalize(I - 2 * (N * I) * N)};
-	if (std::fabs(r * N + I * N) >= Float::epsilon) {
-		std::cerr << r * N << " " << I * N << '\n';
-		assert(false);
-	}
-	return r;
+	return normalize(I - 2 * (N * I) * N);
 }
 
 double incident_angle(const Ray& ray, const Vector& normal) {
@@ -191,9 +166,6 @@ Color illuminate(const Vector& point, const LightSourceList& ll, const SurfaceLi
 
 		const auto [hit, s] = find_closest_hit(ray, light->position(), sl);
 		if (hit && s && *hit == point) {
-			auto sphere = get_sphere(s);
-			if (sphere && reflecting)
-				std::cerr << doing_reflection << " " << point << " illuminated " << sphere->pos() << '\n';
 			const Vector pos {light->position()};
 			const Vector dir {ray.direction()};
 			const Material m {s->material(*hit)};
@@ -208,9 +180,6 @@ Color illuminate(const Vector& point, const LightSourceList& ll, const SurfaceLi
 			color.g += b * c * sc.g / (r*r);
 		}
 	}
-
-	if (reflecting && color.r == 0 && color.g == 0 && color.b == 0)
-		std::cerr << doing_reflection << " " << point << " not illuminated\n";
 
 	return color;
 }
